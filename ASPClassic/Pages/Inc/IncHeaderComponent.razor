@@ -1,0 +1,24 @@
+@namespace ASPClassic.Pages.Inc
+
+@* Port of Inc_Header (inc_header.asp). Renders the content header with page title and breadcrumb navigation. *@
+
+<div class="content-wrapper" style="padding: 16px;">
+    @* Content Header (Page header) *@
+    <div style="margin-bottom: 16px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+            <div style="flex: 0 0 auto; max-width: 50%;">
+                <MudText Typo="Typo.h5" Style="margin: 0; color: var(--mud-palette-text-primary);">
+                    @PageTitle
+                </MudText>
+            </div>
+            <div style="flex: 0 0 auto; max-width: 50%;">
+                <MudBreadcrumbs Items="_breadcrumbItems" Style="padding: 0;" />
+            </div>
+        </div>
+    </div>
+
+    @* Main content area — child content from the hosting page *@
+    <div>
+        @ChildContent
+    </div>
+</div>

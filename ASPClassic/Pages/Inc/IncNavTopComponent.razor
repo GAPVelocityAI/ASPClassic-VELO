@@ -1,0 +1,158 @@
+@namespace ASPClassic.Pages.Inc
+
+@* Port of inc_nav_top.asp (Inc_Nav_Top) — top navigation bar component. *@
+
+<nav class="main-header navbar navbar-expand" style="background-color:#fff; border-bottom:1px solid #dee2e6; min-height:38px; padding:0 0.5rem;" role="navigation">
+    @if (ShowFullNavbar)
+    {
+        @* Left navbar links — shown only when ShowFullNavbar is true *@
+        <ul style="display:flex; list-style:none; margin:0; padding:0; align-items:center;">
+            <li style="padding:0 0.25rem;">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                               Size="Size.Small"
+                               OnClick="OnToggleSidebarClick"
+                               Title="Toggle sidebar" />
+            </li>
+            <li style="padding:0 0.25rem;">
+                <MudLink OnClick="OnHomeClick"
+                         Style="text-decoration:none; color:#495057; font-size:0.875rem; padding:0.5rem;">
+                    Home
+                </MudLink>
+            </li>
+            <li style="padding:0 0.25rem;">
+                <MudLink OnClick="OnContactClick"
+                         Style="text-decoration:none; color:#495057; font-size:0.875rem; padding:0.5rem;">
+                    Contact
+                </MudLink>
+            </li>
+        </ul>
+
+        @* Spacer *@
+        <div style="flex:1;"></div>
+
+        @* Right navbar links *@
+        <ul style="display:flex; list-style:none; margin:0; padding:0; align-items:center;">
+            @* Messages Dropdown *@
+            <li style="padding:0 0.25rem;">
+                <MudMenu Icon="@Icons.Material.Filled.Chat"
+                         AnchorOrigin="Origin.BottomRight"
+                         TransformOrigin="Origin.TopRight">
+                    <MudMenuItem OnClick="@(() => OnMessageClick("Brad Diesel"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:280px;">
+                            <MudAvatar Size="Size.Medium" Color="Color.Primary">BD</MudAvatar>
+                            <div>
+                                <MudText Typo="Typo.subtitle2">Brad Diesel</MudText>
+                                <MudText Typo="Typo.body2" Style="color:#6c757d;">Call me whenever you can...</MudText>
+                                <MudText Typo="Typo.caption" Style="color:#adb5bd;">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Size="Size.Small" Style="vertical-align:middle;" /> 4 Hours Ago
+                                </MudText>
+                            </div>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="@(() => OnMessageClick("John Pierce"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:280px;">
+                            <MudAvatar Size="Size.Medium" Color="Color.Secondary">JP</MudAvatar>
+                            <div>
+                                <MudText Typo="Typo.subtitle2">John Pierce</MudText>
+                                <MudText Typo="Typo.body2" Style="color:#6c757d;">I got your message bro</MudText>
+                                <MudText Typo="Typo.caption" Style="color:#adb5bd;">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Size="Size.Small" Style="vertical-align:middle;" /> 4 Hours Ago
+                                </MudText>
+                            </div>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="@(() => OnMessageClick("Nora Silvester"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:280px;">
+                            <MudAvatar Size="Size.Medium" Color="Color.Warning">NS</MudAvatar>
+                            <div>
+                                <MudText Typo="Typo.subtitle2">Nora Silvester</MudText>
+                                <MudText Typo="Typo.body2" Style="color:#6c757d;">The subject goes here</MudText>
+                                <MudText Typo="Typo.caption" Style="color:#adb5bd;">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Size="Size.Small" Style="vertical-align:middle;" /> 4 Hours Ago
+                                </MudText>
+                            </div>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="OnSeeAllMessagesClick">
+                        <MudText Typo="Typo.body2" Align="Align.Center" Style="color:#007bff;">See All Messages</MudText>
+                    </MudMenuItem>
+                </MudMenu>
+                <MudBadge Content="3" Color="Color.Error" Overlap="true" Bordered="true" Style="position:relative; top:-8px; right:12px; pointer-events:none;" />
+            </li>
+
+            @* Notifications Dropdown *@
+            <li style="padding:0 0.25rem;">
+                <MudMenu Icon="@Icons.Material.Filled.Notifications"
+                         AnchorOrigin="Origin.BottomRight"
+                         TransformOrigin="Origin.TopRight">
+                    <MudMenuItem Disabled="true">
+                        <MudText Typo="Typo.subtitle2" Align="Align.Center">@NotificationCount Notifications</MudText>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="@(() => OnNotificationClick("messages"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:250px;">
+                            <MudIcon Icon="@Icons.Material.Filled.Email" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">4 new messages</MudText>
+                            <MudText Typo="Typo.caption" Style="margin-left:auto; color:#adb5bd;">3 mins</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="@(() => OnNotificationClick("friends"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:250px;">
+                            <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">8 friend requests</MudText>
+                            <MudText Typo="Typo.caption" Style="margin-left:auto; color:#adb5bd;">12 hours</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="@(() => OnNotificationClick("reports"))">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:250px;">
+                            <MudIcon Icon="@Icons.Material.Filled.Description" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">3 new reports</MudText>
+                            <MudText Typo="Typo.caption" Style="margin-left:auto; color:#adb5bd;">2 days</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="OnSeeAllNotificationsClick">
+                        <MudText Typo="Typo.body2" Align="Align.Center" Style="color:#007bff;">See All Notifications</MudText>
+                    </MudMenuItem>
+                </MudMenu>
+                <MudBadge Content="@NotificationCount" Color="Color.Warning" Overlap="true" Bordered="true" Style="position:relative; top:-8px; right:12px; pointer-events:none;" />
+            </li>
+
+            @* Administration button *@
+            <li style="padding:0 0.25rem;">
+                <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                               Size="Size.Small"
+                               OnClick="OnAdministrationClick"
+                               Title="Administration" />
+            </li>
+        </ul>
+    }
+    else
+    {
+        @* Minimal navbar — legacy ELSE branch (always executed because IF False THEN) *@
+        <ul style="display:flex; list-style:none; margin:0; padding:0; align-items:center;">
+            <li style="padding:0 0.25rem;">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                               Size="Size.Small"
+                               OnClick="OnToggleSidebarClick"
+                               Title="Toggle sidebar" />
+            </li>
+        </ul>
+
+        <div style="flex:1;"></div>
+
+        <ul style="display:flex; list-style:none; margin:0; padding:0; align-items:center;">
+            <li style="padding:0 0.25rem;">
+                <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                               Size="Size.Small"
+                               OnClick="OnAdministrationClick"
+                               Title="Administration" />
+            </li>
+        </ul>
+    }
+</nav>

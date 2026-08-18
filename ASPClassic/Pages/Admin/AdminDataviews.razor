@@ -1,0 +1,370 @@
+@page "/aspclassic-vbscript/admin-dataviews"
+
+@using ASPClassic.Application.DTOs.Data
+@using ASPClassic.Application.DTOs.Admin
+@using MudBlazor
+
+<PageTitle>@_pageTitle</PageTitle>
+
+@if (!string.IsNullOrEmpty(_successMessage))
+{
+    <MudAlert Severity="Severity.Success" Class="mb-2" ShowCloseIcon="true" CloseIconClicked="() => _successMessage = string.Empty">
+        @_successMessage
+    </MudAlert>
+}
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="mb-2" ShowCloseIcon="true" CloseIconClicked="() => _errorMessage = string.Empty">
+        @_errorMessage
+    </MudAlert>
+}
+
+@if (_showForm)
+{
+    <MudCard Class="mb-4" Elevation="2">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">
+                    @(_editMode == "edit" ? "Edit" : "Add") Data View
+                </MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                @* A ViewID is non-zero, not positive — the built-in views are negative. *@
+                @if (_editMode == "edit" && _editItemId != 0)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.List" OnClick="OnManageFieldsClick">
+                        Manage Fields
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Visibility" OnClick="OnOpenDataViewClick" Class="ml-1">
+                        Open Data View
+                    </MudButton>
+                }
+                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="OnCancelFormClick" Title="Cancel" />
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Title</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.Title" Label="Title" Placeholder="Title"
+                                  Required="true" RequiredError="Title is required"
+                                  HelperText="The title will be displayed at the top of the page" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Published</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudSwitch @bind-Value="_formModel.Published" Label="Published" Color="Color.Primary"
+                               LabelPlacement="Placement.End" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Description</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    @* The metadata types this field as Rich Text (14) and the legacy edited it in
+                       Summernote. A plain textarea with the word "rich" in its placeholder is the
+                       one thing it must not be — what is stored here is rendered as HTML on the
+                       page below the view's title. *@
+                    <ASPClassic.Shared.RichTextEditor @bind-Value="_formModel.ViewDescription" />
+                    <MudText Typo="Typo.caption" Class="mt-1" Style="color:#64748b;">
+                        This text is displayed below the title, before the datatable.
+                    </MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Data Source</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudSelect @bind-Value="_formModel.DataSource" Label="Data Source"
+                               HelperText="Choose the Connection String to use">
+                        @foreach (var ds in _dataSources)
+                        {
+                            <MudSelectItem Value="@ds">@ds</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Main Table Name</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.MainTable" Label="Main Table Name"
+                                  Placeholder="Main Database Table Name"
+                                  HelperText="The database table name from which data will be queried and modified" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Primary Key</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.Primarykey" Label="Primary Key"
+                                  Placeholder="Primary Key (must be single numerical column)"
+                                  HelperText="A column name which serves as a primary key in the database table" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Order By</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.OrderBy" Label="Order By"
+                                  Placeholder="Column1 ASC, Column2 DESC"
+                                  HelperText="Default sorting expression when querying from the database table" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Row Re-order Column</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.RowReorderColumn" Label="Row Re-order Column"
+                                  Placeholder="Column1"
+                                  HelperText="If specified, this column will be used for sorting and reordering the rows" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Source Procedure</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.ViewProcedure" Label="Source Procedure"
+                                  Placeholder="Procedure for View"
+                                  HelperText="Execute this stored procedure instead of querying directly from a table" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Modification Procedure</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.ModificationProcedure" Label="Modification Procedure"
+                                  Placeholder="Procedure for Modification"
+                                  HelperText="Execute this stored procedure instead of modifying data directly in a table" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Deletion Procedure</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField @bind-Value="_formModel.DeleteProcedure" Label="Deletion Procedure"
+                                  Placeholder="Procedure for Deletion"
+                                  HelperText="Execute this stored procedure instead of deleting directly from a table" />
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>Properties</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    @foreach (var flag in _viewFlags)
+                    {
+                        <div class="d-flex align-center mb-1">
+                            <MudCheckBox Value="@IsFlagSet(_formModel.Flags, flag.FlagValue)"
+                                         ValueChanged="@((bool val) => ToggleFlag(val, flag.FlagValue, true))"
+                                         Label="@flag.FlagLabel" Color="Color.Primary" />
+                            @if (!string.IsNullOrEmpty(flag.FlagGlyph))
+                            {
+                                <MudIcon Icon="@MapGlyphToMudIcon(flag.FlagGlyph)" Size="Size.Small" Class="ml-1" />
+                            }
+                        </div>
+                    }
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>DataTable Row Button Style</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudSelect @bind-Value="_formModel.DataTableModifierButtonStyle" Label="DataTable Row Button Style"
+                               HelperText="Choose how the Add/Edit/Clone/Delete buttons would look like">
+                        @foreach (var style in _modifierButtonStyles)
+                        {
+                            @if (short.TryParse(style.StyleValue, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var styleVal))
+                            {
+                                <MudSelectItem Value="@styleVal">@style.StyleLabel</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>DataTable Default Page Size</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudSelect @bind-Value="_formModel.DataTableDefaultPageSize" Label="DataTable Default Page Size"
+                               HelperText="Choose the default number of rows per page">
+                        <MudSelectItem Value="10">10</MudSelectItem>
+                        <MudSelectItem Value="25">25</MudSelectItem>
+                        <MudSelectItem Value="50">50</MudSelectItem>
+                        <MudSelectItem Value="100">100</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>DataTable Paging Style</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudSelect @bind-Value="_formModel.DataTablePagingStyle" Label="DataTable Paging Style"
+                               HelperText="Choose how the pagination buttons would look like">
+                        @foreach (var ps in _pagingStyles)
+                        {
+                            <MudSelectItem Value="@ps.StyleValue">@ps.StyleLabel</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" sm="2">
+                    <MudText Typo="Typo.body1" Class="pt-3"><b>DataTable Options</b></MudText>
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    @foreach (var flag in _dataTableFlags)
+                    {
+                        <div class="d-flex align-center mb-1">
+                            <MudCheckBox Value="@IsFlagSet(_formModel.DataTableFlags, flag.FlagValue)"
+                                         ValueChanged="@((bool val) => ToggleFlag(val, flag.FlagValue, false))"
+                                         Label="@flag.FlagLabel" Color="Color.Primary" />
+                            @if (!string.IsNullOrEmpty(flag.FlagGlyph))
+                            {
+                                <MudIcon Icon="@MapGlyphToMudIcon(flag.FlagGlyph)" Size="Size.Small" Class="ml-1" />
+                            }
+                            @if (!string.IsNullOrEmpty(flag.FlagTooltip))
+                            {
+                                <MudTooltip Text="@flag.FlagTooltip">
+                                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Class="ml-1" Color="Color.Info" />
+                                </MudTooltip>
+                            }
+                        </div>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" OnClick="OnCancelFormClick">Cancel</MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="OnSubmitClick"
+                       Disabled="_isSaving">
+                @if (_isSaving)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                }
+                Submit
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+
+<!-- Items List Grid -->
+<!-- Columns: ID, Title, Published, Properties, DataTable Options, Actions -->
+<MudCard Elevation="2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="OnAddClick">
+                Add Data View
+            </MudButton>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        @if (_isLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudDataGrid Items="@_dataViews" Dense="true" Hover="true" Striped="true" Bordered="true"
+                         FixedHeader="true" Height="calc(100vh - 400px)">
+                <Columns>
+                    @* The ID column is hidden by request. The legacy list does show it
+                       (admin_dataviews.asp, <th>ID</th>), so this is a deliberate
+                       divergence, not a porting omission. The id is still what every row
+                       action is keyed on — it is only not displayed. *@
+                    <TemplateColumn Title="Title">
+                        <CellTemplate>
+                            <MudLink OnClick="@(() => OnViewTitleClick(context.Item))">
+                                @context.Item.Title
+                            </MudLink>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Published">
+                        <CellTemplate>
+                            @if (context.Item.Published)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small"
+                                         Title="Published" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small"
+                                         Title="Not Published" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Properties">
+                        <CellTemplate>
+                            @foreach (var flag in _viewFlags)
+                            {
+                                @if (IsFlagSet(context.Item.Flags, flag.FlagValue))
+                                {
+                                    <MudTooltip Text="@flag.FlagLabel">
+                                        <MudIcon Icon="@MapGlyphToMudIcon(flag.FlagGlyph)" Size="Size.Small" Class="mr-1" />
+                                    </MudTooltip>
+                                }
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="DataTable Options">
+                        <CellTemplate>
+                            @foreach (var flag in _dataTableFlags)
+                            {
+                                @if (IsFlagSet(context.Item.DataTableFlags, flag.FlagValue))
+                                {
+                                    <MudTooltip Text="@flag.FlagLabel">
+                                        <MudIcon Icon="@MapGlyphToMudIcon(flag.FlagGlyph)" Size="Size.Small" Class="mr-1" />
+                                    </MudTooltip>
+                                }
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Actions">
+                        <CellTemplate>
+                            @* Open and Clone are additions. The legacy list has only Manage Fields,
+                               Edit and Delete — it opens a view through the Title link and keeps
+                               "Open Data View" on the edit form. Both are here because reaching a
+                               view and duplicating one are the two things this screen is for. *@
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Visibility"
+                                       OnClick="@(() => OnOpenDataViewForItem(context.Item.ViewID))"
+                                       Class="mr-1">
+                                Open
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.ContentCopy"
+                                       OnClick="@(() => OnCloneClick(context.Item))"
+                                       Class="mr-1">
+                                Clone
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.List"
+                                       OnClick="@(() => OnManageFieldsForItem(context.Item.ViewID))"
+                                       Class="mr-1">
+                                Manage Fields
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="@(() => OnEditClick(context.Item))"
+                                       Class="mr-1">
+                                Edit
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="@(() => OnDeleteClick(context.Item))">
+                                Delete
+                            </MudButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        }
+    </MudCardContent>
+</MudCard>

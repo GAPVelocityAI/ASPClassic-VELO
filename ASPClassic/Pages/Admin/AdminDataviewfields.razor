@@ -1,0 +1,224 @@
+@page "/aspclassic-vbscript/admin-dataviewfields"
+@namespace ASPClassic.Pages.Admin
+@using ASPClassic.Application.DTOs.Admin
+@layout ASPClassic.Shared.MainLayout
+
+@* Port of admin_dataviewfields.asp. The legacy rendered a list of the view's fields with an
+   inline add/edit form below it, both driven by the same querystring — mode and ItemID. That
+   shape is kept: one page, list plus form, no dialog. *@
+
+<PageTitle>@_pageTitle</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-4">
+
+    <MudText Typo="Typo.h5" Class="mb-3">@_pageTitle</MudText>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="mb-3">@_errorMessage</MudAlert>
+    }
+
+    @if (!string.IsNullOrEmpty(_successMessage))
+    {
+        <MudAlert Severity="Severity.Success" Class="mb-3">@_successMessage</MudAlert>
+    }
+
+    @* Saved, with something the author needs to know — a field naming a column that is not there
+       yet is legitimate while the column is on its way and silently broken if it never arrives. *@
+    @if (!string.IsNullOrEmpty(_warningMessage))
+    {
+        <MudAlert Severity="Severity.Warning" Class="mb-3">
+            @_warningMessage
+
+            @if (!string.IsNullOrEmpty(_missingColumn))
+            {
+                @* Defining a field and adding its column are one intention. Splitting them across
+                   two tools is where the mistake happens, so the second half is offered here. *@
+                <div class="mt-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.AddCircleOutline"
+                               OnClick="OnAddMissingColumnAsync">
+                        Add the '@_missingColumn' column
+                    </MudButton>
+                </div>
+            }
+        </MudAlert>
+    }
+
+    @if (_loading)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (_viewId == 0)
+    {
+        @* The legacy showed the same thing: without a ViewID there is no field list to manage. *@
+        <MudAlert Severity="Severity.Info">
+            Choose a data view first — this page manages the fields of one view.
+        </MudAlert>
+    }
+    else
+    {
+        <MudToolBar Dense="true" Class="mb-2">
+            <MudButton StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       OnClick="OnAddFieldClick">Add Field</MudButton>
+
+            <MudButton StartIcon="@Icons.Material.Filled.Sort"
+                       Class="ml-2"
+                       OnClick="OnUpdateSortingClick">Update Sorting</MudButton>
+
+            @* Auto-Initialize removed by request. It was a button I added here, not a
+               DataViewAction row, so it survived removing the action from the toolbar of the
+               data view screen — two buttons for the same thing, in two different places. *@
+
+            <MudSpacer />
+
+            <MudButton StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="OnEditDataViewClick">Edit Data View</MudButton>
+
+            <MudButton StartIcon="@Icons.Material.Filled.Visibility"
+                       Class="ml-2"
+                       OnClick="OnOpenDataViewClick">Open Data View</MudButton>
+        </MudToolBar>
+
+        <MudTable Items="@_fields" Dense="true" Hover="true" Striped="true" Class="mb-4">
+            <HeaderContent>
+                <MudTh>Order</MudTh>
+                <MudTh>Label</MudTh>
+                <MudTh>Source</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh Style="width:120px"></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Order">@context.FieldOrder</MudTd>
+                <MudTd DataLabel="Label">@context.FieldLabel</MudTd>
+                <MudTd DataLabel="Source">@context.FieldSource</MudTd>
+                <MudTd DataLabel="Type">@GetFieldTypeLabel(context.FieldType)</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Size="Size.Small"
+                                   OnClick="@(() => OnEditFieldClick(context.FieldID))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Size="Size.Small"
+                                   Color="Color.Error"
+                                   OnClick="@(() => OnDeleteFieldClick(context.FieldID))" />
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText Typo="Typo.body2">This view has no fields yet.</MudText>
+            </NoRecordsContent>
+        </MudTable>
+
+        @if (_mode == "add" || _mode == "edit")
+        {
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h6" Class="mb-3">
+                    @(_mode == "add" ? "Add Field" : "Edit Field")
+                </MudText>
+
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.FieldLabel"
+                                      Label="Field Label"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.FieldSource"
+                                      Label="Field Source"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string" @bind-Value="_editModel.FieldType"
+                                   Label="Field Type"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var t in _fieldTypes)
+                            {
+                                <MudSelectItem T="string" Value="@t.TypeValue">@t.TypeLabel</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="_editModel.FieldOrder"
+                                         Label="Field Order"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.DefaultValue"
+                                      Label="Default Value"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="_editModel.MaxLength"
+                                         Label="Max Length"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.UriPath"
+                                      Label="URI Path"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="int" @bind-Value="_editModel.UriStyle"
+                                   Label="URI Style"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var s in _uriStyles)
+                            {
+                                <MudSelectItem T="int" Value="@(int.TryParse(s.StyleValue, out var sv) ? sv : 0)">
+                                    @s.StyleLabel
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Flags</MudText>
+                        @* One integer column holds all of these; the handler folds each toggle
+                           back into the bitmask. *@
+                        @foreach (var f in _fieldFlags)
+                        {
+                            var value = int.TryParse(f.FlagValue, out var fv) ? fv : 0;
+                            <MudCheckBox T="bool"
+                                         Value="@(_selectedFieldFlags.Contains(value))"
+                                         ValueChanged="@((bool v) => OnFlagChanged(value, v))"
+                                         Label="@f.FlagLabel"
+                                         Dense="true" />
+                        }
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.FieldDescription"
+                                      Label="Description"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_editModel.FieldTooltip"
+                                      Label="Tooltip"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudToolBar Dense="true" Class="mt-3">
+                    <MudButton Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               OnClick="OnSubmitClick">Save</MudButton>
+                    <MudButton Class="ml-2" OnClick="OnCancelEditClick">Cancel</MudButton>
+                </MudToolBar>
+            </MudPaper>
+        }
+    }
+
+</MudContainer>

@@ -1,0 +1,61 @@
+/* ASPClassic Portal — global site styles */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+
+/* Blazor error UI */
+#blazor-error-ui {
+    background: #ffcccb;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0,0,0,0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem;
+    position: fixed;
+    width: 100%;
+    z-index: 9999;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+/* DataView grid density */
+.mud-table-dense .mud-table-cell {
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+/* Admin page card style */
+.admin-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 12px;
+    background: #fff;
+}
+
+/* Status bar text */
+.status-bar-text {
+    font-size: 10px;
+    color: #718096;
+}
+
+/* Breadcrumb link style */
+.breadcrumb-link {
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}

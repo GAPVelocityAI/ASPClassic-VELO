@@ -1,0 +1,28 @@
+@page "/aspclassic-vbscript/blank"
+
+@using ASPClassic.Application.Services.Inc
+@using ASPClassic.Infrastructure
+
+<PageTitle>@_pageTitle</PageTitle>
+
+<IncMetaComponent />
+
+<div style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
+    <IncHeaderComponent />
+    
+    <div style="flex:1; overflow:auto; padding:16px;">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+            <MudPaper Elevation="2" Class="pa-6">
+                <MudText Typo="Typo.h4" Class="mb-4">@_pageTitle</MudText>
+                <MudDivider Class="mb-4" />
+                <MudText Typo="Typo.body1">
+                    Hello, World! Put your content here.
+                </MudText>
+            </MudPaper>
+        </MudContainer>
+    </div>
+    
+    <IncFooterComponent />
+</div>
+
+<IncFooterJscriptsComponent />

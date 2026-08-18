@@ -1,0 +1,10 @@
+@namespace ASPClassic.Pages.Inc
+
+@* Port of inc_footer_jscripts.asp — renders nothing visible; processes MSG/ErrorMessage
+   parameters and displays MudBlazor Snackbar notifications matching the legacy toastr calls.
+   The legacy file was a server-side include that emitted <script> blocks with toastr calls
+   based on Request("MSG") and strError. In Blazor, this becomes a renderless component
+   that uses ISnackbar to show equivalent notifications. *@
+
+@* No visible markup — all logic is in the code-behind *@
+

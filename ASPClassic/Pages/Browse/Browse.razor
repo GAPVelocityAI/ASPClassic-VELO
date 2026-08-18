@@ -1,0 +1,279 @@
+@page "/aspclassic-vbscript/browse"
+
+@using ASPClassic.Application.DTOs.Data
+
+<PageTitle>@_pageTitle</PageTitle>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    <MudText Typo="Typo.h6" Align="Align.Center" Class="mt-4">
+        <MudIcon Icon="@Icons.Material.Filled.HourglassTop" /> Loading...
+    </MudText>
+}
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="ma-4">
+        <MudText Typo="Typo.h6">Critical Error!</MudText>
+        <MudText>@_errorMessage</MudText>
+    </MudAlert>
+}
+else
+{
+    <MudCard Class="ma-2" Elevation="2">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    @* Back button *@
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.ArrowBack"
+                               OnClick="OnBackClick">
+                        Back
+                    </MudButton>
+
+                    @* Refresh button *@
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.Refresh"
+                               OnClick="OnRefreshClick">
+                        Refresh
+                    </MudButton>
+
+                    @* Inline action buttons (clone, edit, delete) — only in browse/view mode *@
+                    @if (!_isFormMode)
+                    {
+                        @if (_allowClone)
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Info"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.ContentCopy"
+                                       OnClick="OnCloneClick">
+                                Clone
+                            </MudButton>
+                        }
+                        @if (_allowUpdate)
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Warning"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="OnEditClick">
+                                Edit
+                            </MudButton>
+                        }
+                        @if (_allowDelete)
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="OnDeleteClick">
+                                Delete
+                            </MudButton>
+                        }
+
+                        @* Custom inline action buttons *@
+                        @if (_showCustomActions)
+                        {
+                            @foreach (var action in _inlineActions)
+                            {
+                                <MudButton Variant="Variant.Outlined"
+                                           Color="Color.Default"
+                                           Size="Size.Small"
+                                           StartIcon="@GetMudIcon(action.GlyphIcon)"
+                                           OnClick="@(() => OnCustomActionClick(action))"
+                                           title="@(action.ActionTooltip ?? action.ActionLabel)">
+                                    @action.ActionLabel
+                                </MudButton>
+                            }
+                        }
+                    }
+
+                    <MudSpacer />
+
+                    @* Copy link button *@
+                    <MudIconButton Icon="@Icons.Material.Filled.Link"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   OnClick="OnCopyLinkClick"
+                                   Title="Get URL for this page" />
+                </div>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudText Typo="Typo.h6">@_browseTitle</MudText>
+            </CardHeaderActions>
+        </MudCardHeader>
+
+        <MudCardContent>
+            @if (_recordLoading)
+            {
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" Class="d-flex mx-auto my-4" />
+            }
+            else if (_recordNotFound)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+                    <MudText Typo="Typo.h6">Not Found</MudText>
+                    <MudText>Requested record not found.</MudText>
+                </MudAlert>
+            }
+            else if (_isFormMode)
+            {
+                @* Form mode (add / edit / clone) — render editable fields *@
+                <MudForm @ref="_formRef">
+                    <MudGrid Spacing="2">
+                        @foreach (var field in _viewFields)
+                        {
+                            var fieldKey = field.FieldSource ?? field.FieldLabel;
+                            @* portal.DataViewFieldFlags: 1 Show in Form, 2 Required, 4 Read Only,
+                               8 Show in Items List, 16 Show in Search. *@
+                            var isRequired = (field.FieldFlags & 2) > 0;
+                            var isReadOnly = (field.FieldFlags & 4) > 0;
+                            var isHidden = (field.FieldFlags & 1) == 0;
+
+                            @if (isHidden)
+                            {
+                                continue;
+                            }
+
+                            <MudItem xs="12" sm="6" md="4">
+                                @if (field.FieldType == "select" && _lookupData.ContainsKey(fieldKey))
+                                {
+                                    <MudSelect T="string"
+                                               Label="@field.FieldLabel"
+                                               @bind-Value="_formValues[fieldKey]"
+                                               Required="isRequired"
+                                               Disabled="isReadOnly"
+                                               Variant="Variant.Outlined"
+                                               Dense="true"
+                                               HelperText="@field.FieldTooltip">
+                                        <MudSelectItem T="string" Value="@string.Empty">-- Select --</MudSelectItem>
+                                        @foreach (var item in _lookupData[fieldKey])
+                                        {
+                                            <MudSelectItem T="string" Value="@item.Value">@item.Title</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
+                                else if (field.FieldType == "checkbox" || field.FieldType == "bit")
+                                {
+                                    var isChecked = _formValues.ContainsKey(fieldKey) &&
+                                        (_formValues[fieldKey] == "1" || string.Equals(_formValues[fieldKey], "true", StringComparison.OrdinalIgnoreCase));
+                                    <MudCheckBox T="bool"
+                                                 Value="isChecked"
+                                                 ValueChanged="@(v => _formValues[fieldKey] = v ? "1" : "0")"
+                                                 Label="@field.FieldLabel"
+                                                 Disabled="isReadOnly"
+                                                 Color="Color.Primary" />
+                                }
+                                else if (field.FieldType == "date" || field.FieldType == "datetime")
+                                {
+                                    <MudDatePicker Label="@field.FieldLabel"
+                                                   Date="GetDateValue(fieldKey)"
+                                                   DateChanged="@(v => _formValues[fieldKey] = v?.ToString("yyyy-MM-dd") ?? string.Empty)"
+                                                   Required="isRequired"
+                                                   Disabled="isReadOnly"
+                                                   Variant="Variant.Outlined"
+                                                   HelperText="@field.FieldTooltip" />
+                                }
+                                else if (field.FieldType == "textarea" || field.FieldType == "html" || field.FieldType == "code")
+                                {
+                                    <MudTextField T="string"
+                                                  Label="@field.FieldLabel"
+                                                  @bind-Value="_formValues[fieldKey]"
+                                                  Required="isRequired"
+                                                  ReadOnly="isReadOnly"
+                                                  Lines="4"
+                                                  MaxLength="@(field.MaxLength ?? 4000)"
+                                                  Variant="Variant.Outlined"
+                                                  HelperText="@field.FieldTooltip" />
+                                }
+                                else
+                                {
+                                    @* Default: text input *@
+                                    <MudTextField T="string"
+                                                  Label="@field.FieldLabel"
+                                                  @bind-Value="_formValues[fieldKey]"
+                                                  Required="isRequired"
+                                                  ReadOnly="isReadOnly"
+                                                  MaxLength="@(field.MaxLength ?? 500)"
+                                                  Variant="Variant.Outlined"
+                                                  HelperText="@field.FieldTooltip" />
+                                }
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudForm>
+            }
+            else
+            {
+                @* Browse/view mode — render read-only detail view *@
+                <MudSimpleTable Dense="true" Striped="true" Hover="true" Style="overflow-x:auto;">
+                    <thead>
+                        <tr>
+                            <th style="width:200px;">Field</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var field in _viewFields)
+                        {
+                            var fieldKey = field.FieldSource ?? field.FieldLabel;
+                            @* A row shows the fields flagged for the items list, not bit 4 —
+                               which is Read Only and says nothing about visibility. *@
+                            var isHidden = (field.FieldFlags & 8) == 0;
+
+                            @if (isHidden)
+                            {
+                                continue;
+                            }
+
+                            <tr>
+                                <td><strong>@field.FieldLabel</strong></td>
+                                <td>
+                                    @if (field.FieldType == "checkbox" || field.FieldType == "bit")
+                                    {
+                                        var val = GetFieldValue(fieldKey);
+                                        var isChecked = val == "1" || string.Equals(val, "true", StringComparison.OrdinalIgnoreCase);
+                                        <MudIcon Icon="@(isChecked ? Icons.Material.Filled.CheckBox : Icons.Material.Filled.CheckBoxOutlineBlank)"
+                                                 Color="@(isChecked ? Color.Success : Color.Default)"
+                                                 Size="Size.Small" />
+                                    }
+                                    else
+                                    {
+                                        @GetFieldValue(fieldKey)
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudCardContent>
+
+        <MudCardActions>
+            @if (_isFormMode)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           OnClick="OnSaveClick">
+                    Save Changes
+                </MudButton>
+
+                @if (!string.IsNullOrEmpty(_itemId))
+                {
+                    <MudSpacer />
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Default"
+                               StartIcon="@Icons.Material.Filled.Close"
+                               OnClick="OnCancelEditClick">
+                        Close
+                    </MudButton>
+                }
+            }
+        </MudCardActions>
+    </MudCard>
+}

@@ -1,0 +1,337 @@
+@inherits LayoutComponentBase
+@using ASPClassic.Infrastructure
+@using ASPClassic.Application.Services.Inc
+@using ASPClassic.Application.DTOs.Core
+@inject AppState AppState
+@inject IIncFunctionsService FunctionsService
+@inject NavigationManager NavigationManager
+@inject ASPClassic.Application.Services.Dataview.IDataviewService DataviewService
+@using ASPClassic.Application.DTOs.Data
+@using ASPClassic.Pages.Inc
+@implements IDisposable
+
+<MudThemeProvider Theme="_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@* ── Single-layout flex column shell ── *@
+<div style="display:flex; flex-direction:column; height:100vh; overflow:hidden; font-family:'Roboto',sans-serif;">
+
+    @* ── Menu bar row (30px) ── *@
+    <div class="app-menubar" style="flex-shrink:0; height:32px; background:#1e293b; display:flex; align-items:center; padding:0 8px; gap:2px; z-index:1000;">
+
+        @* Brand / Home *@
+        <a href="/aspclassic-vbscript/default"
+           style="color:#e2e8f0; font-weight:600; font-size:13px; text-decoration:none; padding:0 8px; white-space:nowrap;">
+            ASPClassic Portal
+        </a>
+
+        <div style="width:1px; height:16px; background:rgba(255,255,255,0.18); margin:0 6px;"></div>
+
+        @* DataViews menu — one entry per published, non-system view, read from the DataView table
+           rather than from Navigation, so a view added today is on the menu without anyone adding
+           it twice. The system views are reached from the curated menu and from the Fields and
+           Actions buttons, which is the only way the legacy reaches them. *@
+        <MudMenu Label="DataViews" Dense="true" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft"
+                 Style="color:#e2e8f0; font-size:12px;">
+
+            @if (_dataViews.Count == 0)
+            {
+                <MudMenuItem Disabled="true">
+                    @(_dataViewsLoaded ? "No published data views" : "Loading…")
+                </MudMenuItem>
+            }
+            else
+            {
+                @foreach (var view in _dataViews)
+                {
+                    var captured = view;
+                    <MudMenuItem OnClick="@(() => GoToView(captured.ViewID))">
+                        @captured.Title
+                    </MudMenuItem>
+                }
+            }
+
+            <MudDivider />
+            <MudMenuItem OnClick="ReloadDataViewsAsync">Refresh list</MudMenuItem>
+        </MudMenu>
+
+        @* Admin menu *@
+        <MudMenu Label="Admin" Dense="true" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft"
+                 Style="color:#e2e8f0; font-size:12px;">
+            <MudMenuItem OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/admin-dataviews"))">
+                Manage DataViews
+            </MudMenuItem>
+            <MudMenuItem OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/admin-dataviewfields?ViewID=-1"))">
+                Manage Fields
+            </MudMenuItem>
+        </MudMenu>
+
+        @* View menu *@
+        <MudMenu Label="View" Dense="true" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft"
+                 Style="color:#e2e8f0; font-size:12px;">
+            <MudMenuItem OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/view"))">
+                View Page
+            </MudMenuItem>
+            <MudMenuItem OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/blank"))">
+                Blank Page
+            </MudMenuItem>
+        </MudMenu>
+
+        <div style="flex:1;"></div>
+
+        @* Status indicator *@
+        @if (AppState.IsBusy)
+        {
+            <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Warning"
+                                 Style="width:16px; height:16px; margin-right:8px;" />
+        }
+
+        @if (!string.IsNullOrEmpty(AppState.CurrentUser))
+        {
+            <span style="color:#a0aec0; font-size:11px; margin-right:8px;">@AppState.CurrentUser</span>
+        }
+    </div>
+
+    @* ── Toolbar row (38px) ── *@
+    <div class="app-toolbar" style="flex-shrink:0; height:40px; background:#ffffff; border-bottom:1px solid #dde3ec;
+                display:flex; align-items:center; padding:0 6px; gap:2px;">
+
+        <MudTooltip Text="Show or hide the menu">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Size="Size.Small"
+                           OnClick="@(() => _sidebarOpen = !_sidebarOpen)"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <MudTooltip Text="Home">
+            <MudIconButton Icon="@Icons.Material.Filled.Home" Size="Size.Small"
+                           OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/default"))"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <MudTooltip Text="DataViews">
+            <MudIconButton Icon="@Icons.Material.Filled.TableChart" Size="Size.Small"
+                           OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/dataview?ViewID=1"))"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <MudTooltip Text="Browse">
+            <MudIconButton Icon="@Icons.Material.Filled.Search" Size="Size.Small"
+                           OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/browse?ViewID=1"))"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <MudTooltip Text="Admin DataViews">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Size="Size.Small"
+                           OnClick="@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/admin-dataviews"))"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <div style="width:1px; height:20px; background:#dde3ec; margin:0 6px;"></div>
+
+        <MudTooltip Text="Refresh">
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="Size.Small"
+                           OnClick="@OnRefreshClick"
+                           Color="Color.Default" />
+        </MudTooltip>
+
+        <div style="flex:1;"></div>
+
+        @if (!string.IsNullOrEmpty(AppState.StatusMessage))
+        {
+            <span style="color:#718096; font-size:11px; margin-right:8px;">@AppState.StatusMessage</span>
+        }
+    </div>
+
+    @* ── Sidebar + content row (flex:1 — fills remaining height) ── *@
+    @* The sidebar component was generated in full and rendered nowhere, so the application had no
+       navigation at all beyond the menu bar. It is placed here, which is where inc_nav_side.asp
+       sat in the legacy page. *@
+    <div style="flex:1; display:flex; min-height:0;">
+
+        @if (_sidebarOpen)
+        {
+            <div style="width:240px; flex-shrink:0; overflow-y:auto; background:#2d3748;">
+                <IncNavSideComponent @ref="_sideNav" />
+            </div>
+        }
+
+        <div style="flex:1; overflow:auto; position:relative;">
+            @Body
+        </div>
+    </div>
+
+    @* ── Status bar (26px) ── *@
+    <div style="flex-shrink:0; height:26px; background:#edf2f7; border-top:1px solid #e2e8f0;
+                display:flex; align-items:center; padding:0 8px; gap:16px;">
+
+        <span style="font-size:10px; color:#718096;">
+            ASPClassic Portal — Blazor Server (.NET 10)
+        </span>
+
+        <div style="flex:1;"></div>
+
+        <span style="font-size:10px; color:#718096;">
+            @DateTime.Now.ToString("yyyy-MM-dd")
+        </span>
+    </div>
+</div>
+
+
+@* ── Chrome ──────────────────────────────────────────────────────────────────
+   The menu labels and the toolbar icons were inheriting MudBlazor's muted greys,
+   which on a dark navy bar and a near-white strip come out barely legible — the
+   menu read as disabled and the icons as washed out. Set explicitly here, with
+   the hover states that tell you a thing is clickable at all. *@
+<style>
+    .app-menubar .mud-button-root {
+        color: #e8edf5 !important;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        min-width: 0;
+        padding: 3px 10px;
+        border-radius: 4px;
+        transition: background-color .12s ease, color .12s ease;
+    }
+
+    .app-menubar .mud-button-root:hover {
+        background-color: rgba(255, 255, 255, 0.14);
+        color: #ffffff !important;
+    }
+
+    .app-toolbar .mud-icon-button {
+        color: #46536b;
+        border-radius: 6px;
+        transition: background-color .12s ease, color .12s ease;
+    }
+
+    .app-toolbar .mud-icon-button:hover {
+        background-color: #eef2f9;
+        color: #1e293b;
+    }
+
+    .app-toolbar .mud-icon-button:active {
+        background-color: #e2e8f2;
+    }
+</style>
+
+@code {
+    private MudTheme _theme = new MudTheme
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary         = "#2d3748",
+            Secondary       = "#4a5568",
+            AppbarBackground = "#2d3748",
+            Background      = "#f7fafc",
+            Surface         = "#ffffff",
+            DrawerBackground = "#2d3748",
+            DrawerText      = "#e2e8f0"
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary   = "#90cdf4",
+            Secondary = "#a0aec0",
+            Background = "#1a202c",
+            Surface   = "#2d3748"
+        },
+        Typography = new Typography
+        {
+            Default = new DefaultTypography
+            {
+                FontFamily = new[] { "Roboto", "sans-serif" },
+                FontSize   = "0.875rem",
+                FontWeight = "400",
+                LineHeight = "1.43"
+            },
+            Body1 = new Body1Typography
+            {
+                FontFamily = new[] { "Roboto", "sans-serif" },
+                FontSize   = "0.875rem",
+                FontWeight = "400",
+                LineHeight = "1.5"
+            },
+            Body2 = new Body2Typography
+            {
+                FontFamily = new[] { "Roboto", "sans-serif" },
+                FontSize   = "0.8125rem",
+                FontWeight = "400",
+                LineHeight = "1.43"
+            },
+            Button = new ButtonTypography
+            {
+                FontFamily  = new[] { "Roboto", "sans-serif" },
+                FontSize    = "0.8125rem",
+                FontWeight  = "500",
+                LineHeight  = "1.75",
+                LetterSpacing = "0.02857em"
+            },
+            Caption = new CaptionTypography
+            {
+                FontFamily = new[] { "Roboto", "sans-serif" },
+                FontSize   = "0.75rem",
+                FontWeight = "400",
+                LineHeight = "1.66"
+            }
+        }
+    };
+
+    // The menu's data view entries. Held here rather than fetched per render: a layout renders on
+    // every interaction, and a query per render would be a query per keystroke.
+    private List<DataViewDto> _dataViews = new();
+    private bool _dataViewsLoaded;
+
+    private bool _sidebarOpen = true;
+    private IncNavSideComponent? _sideNav;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await ReloadDataViewsAsync();
+    }
+
+    /// <summary>
+    /// Re-reads the published views. Called on every navigation, so a view added on the admin page
+    /// is on the menu by the time the next page loads, and from the menu itself for the case where
+    /// one is added without navigating anywhere.
+    /// </summary>
+    private async Task ReloadDataViewsAsync()
+    {
+        try
+        {
+            _dataViews = await DataviewService.GetNavigableDataViewsAsync();
+        }
+        catch (Exception)
+        {
+            // A menu that cannot load its entries must not take the whole layout down with it —
+            // every page in the application renders inside this component.
+            _dataViews = new List<DataViewDto>();
+        }
+        finally
+        {
+            _dataViewsLoaded = true;
+        }
+    }
+
+    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        await ReloadDataViewsAsync();
+
+        if (_sideNav is not null) await _sideNav.ReloadAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void GoToView(int viewId) =>
+        NavigationManager.NavigateTo($"/aspclassic-vbscript/dataview?ViewID={viewId}");
+
+    public void Dispose() => NavigationManager.LocationChanged -= OnLocationChanged;
+
+    private async Task OnRefreshClick()
+    {
+        await AppState.SendCommandAsync("refresh");
+    }
+}

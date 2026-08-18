@@ -1,0 +1,67 @@
+@page "/"
+@page "/aspclassic-vbscript"
+@page "/aspclassic-vbscript/default"
+@namespace ASPClassic.Pages.Default
+@layout ASPClassic.Shared.MainLayout
+
+@* Port of default.asp — the landing page. The legacy rendered the site title and its included
+   header, then left the body to the navigation includes; there was no content of its own. *@
+
+<PageTitle>@_pageTitle</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+
+    <MudText Typo="Typo.h4" Class="mb-2">@_pageTitle</MudText>
+
+    <MudText Typo="Typo.body1" Class="mb-4">
+        Use the navigation menu to open a data view, or manage the portal's views and fields.
+    </MudText>
+
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-2">Manage Data Views</MudText>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Create, publish and configure the views this portal renders.
+                </MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Settings"
+                           OnClick='@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/admin-dataviews"))'>
+                    Open
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-2">Manage Navigation</MudText>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Add, update or remove the portal's navigation links.
+                </MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Link"
+                           OnClick='@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/dataview?ViewID=-4"))'>
+                    Open
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6" Class="mb-2">Manage Fields</MudText>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Configure the fields shown by each data view.
+                </MudText>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.ViewColumn"
+                           OnClick='@(() => NavigationManager.NavigateTo("/aspclassic-vbscript/admin-dataviewfields?ViewID=-2"))'>
+                    Open
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>

@@ -1,0 +1,57 @@
+@page "/aspclassic-vbscript/page404"
+
+@using ASPClassic.Pages.Inc
+
+<PageTitle>404 Page Not Found</PageTitle>
+
+<IncMetaComponent />
+
+<IncHeaderComponent />
+
+<div class="error-page" style="display:flex; align-items:center; justify-content:center; min-height:60vh; padding:24px;">
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:24px; max-width:800px;">
+        <MudText Typo="Typo.h1" Color="Color.Warning" Style="font-size:72px; font-weight:bold;">
+            404
+        </MudText>
+
+        <div style="flex:1; min-width:300px;">
+            <MudText Typo="Typo.h5" Class="mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Medium" Class="mr-1" />
+                Oops! Page not found.
+            </MudText>
+
+            <MudText Typo="Typo.body1" Class="mb-4">
+                We could not find the page you were looking for.
+                <br />
+                Meanwhile, you may
+                <MudLink Href="/aspclassic-vbscript/default" Underline="Underline.Always">return to dashboard</MudLink>
+                or try using the search form.
+            </MudText>
+
+            <div style="display:flex; gap:8px; align-items:stretch;">
+                <MudTextField T="string"
+                              @bind-Value="_searchTerm"
+                              Placeholder="Search"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Style="flex:1;" />
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Warning"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           OnClick="OnSearchClick"
+                           Style="height:40px;">
+                    Search
+                </MudButton>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_redirectMessage))
+            {
+                <MudAlert Severity="Severity.Info" Class="mt-4">@_redirectMessage</MudAlert>
+            }
+        </div>
+    </div>
+</div>
+
+<IncFooterComponent />
+
+<IncFooterJscriptsComponent />

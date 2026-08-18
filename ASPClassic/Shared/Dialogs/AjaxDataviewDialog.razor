@@ -1,0 +1,111 @@
+@namespace ASPClassic.Shared.Dialogs
+@using ASPClassic.Application.DTOs.Dataview
+
+@* Port of the add/edit/clone record modal that browse.asp and dataview.asp open. The legacy posted
+   the form to ajax_dataview.asp and rendered the reply; here the service is called directly, so the
+   round trip through JSON disappears and the values stay typed. *@
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-2" />
+            @TitleForMode
+        </MudText>
+    </TitleContent>
+
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (_fields.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info">This view declares no editable fields.</MudAlert>
+        }
+        else
+        {
+            @* Each field is rendered as the type the portal declares for it. Rendering everything
+               as a text box throws that metadata away, and a foreign key presented as free text
+               will accept a word — which then points at a row that does not exist. *@
+            <MudForm @ref="_form">
+                @foreach (var field in _fields.Where(f => f.ShowInForm).OrderBy(f => f.FieldOrder))
+                {
+                    var captured = field;
+
+                    @if (HasOptions(captured))
+                    {
+                        <MudSelect T="string"
+                                   Label="@captured.FieldLabel"
+                                   HelperText="@captured.FieldDescription"
+                                   Required="@captured.IsRequired"
+                                   ReadOnly="@captured.IsReadOnly"
+                                   Value="@GetValue(captured.FieldSource)"
+                                   ValueChanged="@(v => SetValue(captured.FieldSource, v))"
+                                   Clearable="@(!captured.IsRequired)"
+                                   Margin="Margin.Dense"
+                                   Variant="Variant.Outlined">
+                            @foreach (var option in OptionsFor(captured))
+                            {
+                                <MudSelectItem T="string" Value="@option.Value">@option.Label</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else if (IsBoolean(captured))
+                    {
+                        <MudSwitch T="bool"
+                                   Label="@captured.FieldLabel"
+                                   Disabled="@captured.IsReadOnly"
+                                   Value="@GetBool(captured.FieldSource)"
+                                   ValueChanged="@(v => SetBool(captured.FieldSource, v))"
+                                   Color="Color.Primary" />
+                    }
+                    else if (IsNumeric(captured))
+                    {
+                        <MudTextField T="string"
+                                      Label="@captured.FieldLabel"
+                                      HelperText="@captured.FieldDescription"
+                                      Required="@captured.IsRequired"
+                                      ReadOnly="@captured.IsReadOnly"
+                                      InputType="InputType.Number"
+                                      Value="@GetValue(captured.FieldSource)"
+                                      ValueChanged="@(v => SetValue(captured.FieldSource, v))"
+                                      Margin="Margin.Dense"
+                                      Variant="Variant.Outlined" />
+                    }
+                    else if (IsMultiline(captured))
+                    {
+                        <MudTextField T="string"
+                                      Label="@captured.FieldLabel"
+                                      HelperText="@captured.FieldDescription"
+                                      Required="@captured.IsRequired"
+                                      ReadOnly="@captured.IsReadOnly"
+                                      Lines="4"
+                                      Value="@GetValue(captured.FieldSource)"
+                                      ValueChanged="@(v => SetValue(captured.FieldSource, v))"
+                                      Margin="Margin.Dense"
+                                      Variant="Variant.Outlined" />
+                    }
+                    else
+                    {
+                        <MudTextField T="string"
+                                      Label="@captured.FieldLabel"
+                                      HelperText="@captured.FieldDescription"
+                                      Required="@captured.IsRequired"
+                                      ReadOnly="@captured.IsReadOnly"
+                                      MaxLength="@(captured.MaxLength is > 0 ? captured.MaxLength.Value : 4000)"
+                                      Value="@GetValue(captured.FieldSource)"
+                                      ValueChanged="@(v => SetValue(captured.FieldSource, v))"
+                                      Margin="Margin.Dense"
+                                      Variant="Variant.Outlined" />
+                    }
+                }
+            </MudForm>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="OnCancel" Variant="Variant.Text" Disabled="@_saving">Cancel</MudButton>
+        <MudButton OnClick="OnSave" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="@(_loading || _saving)">@(_saving ? "Saving…" : "Save")</MudButton>
+    </DialogActions>
+</MudDialog>

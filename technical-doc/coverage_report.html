@@ -1,0 +1,680 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASPClassic → Blazor Modernization Coverage Report</title>
+<style>
+* { box-sizing: border-box; }
+html { font-feature-settings: "kern", "liga", "calt"; -webkit-text-size-adjust: 100%; }
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px; line-height: 1.55; color: #1f2937; background: #ffffff;
+    margin: 0; padding: 0; counter-reset: section;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 44px 36px 80px; }
+a { color: #1e3a5f; text-decoration: none; }
+a:hover { text-decoration: underline; }
+p { margin: 0.5em 0; }
+h1, h2, h3, h4 { color: #0a2540; font-weight: 600; letter-spacing: -0.005em; margin: 0; }
+h1 { font-size: 1.75rem; line-height: 1.2; }
+h2 { font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.1em;
+     margin: 2.4em 0 0.9em; padding-bottom: 8px; border-bottom: 2px solid #0a2540; font-weight: 700; }
+section { counter-increment: section; }
+section > h2::before { content: counter(section, decimal-leading-zero) " \00a0\00a0 "; color: #94a3b8; font-weight: 500; letter-spacing: 0.08em; }
+h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin: 1.6em 0 0.55em; font-weight: 700; }
+.meta { color: #475569; font-size: 0.82rem; }
+.meta code { background: #f3f4f6; padding: 1px 6px; font-size: 0.8rem; border: 1px solid #e5e7eb;
+             font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+.hero { border-top: 4px solid #0a2540; border-bottom: 1px solid #d1d5db; padding: 30px 0 28px; margin: 0 0 30px; background: #ffffff; }
+.hero h1 { color: #0a2540; font-size: 1.9rem; margin: 0; }
+.hero .eyebrow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; color: #64748b; font-weight: 700; margin: 0 0 10px; }
+.hero .subtitle { color: #475569; font-size: 0.92rem; margin: 6px 0 0; max-width: 760px; }
+.hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: #eef0f3; border: 1px solid #eef0f3; margin-top: 26px; }
+.hero-stat { background: #ffffff; padding: 14px 16px 12px; }
+.hero-stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 700; }
+.hero-stat-value { font-size: 1.45rem; font-weight: 600; margin-top: 3px; color: #0a2540; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.hero-stat-sub { font-size: 0.72rem; color: #64748b; margin-top: 2px; word-break: break-word; line-height: 1.35; }
+.grade-row { display: flex; align-items: center; gap: 24px; margin-top: 22px; flex-wrap: wrap; }
+.grade-block { flex-shrink: 0; text-align: center; padding: 4px 14px 6px; border-left: 1px solid #d1d5db; border-right: 1px solid #d1d5db; min-width: 120px; }
+.grade-label { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.16em; color: #64748b; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.grade { font-family: Georgia, "Times New Roman", serif; font-size: 3.4rem; font-weight: 400; color: #0a2540; line-height: 1; display: block; text-align: center; }
+.grade-sub { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: #94a3b8; font-weight: 600; line-height: 1; margin-top: 8px; }
+.grade-caption { flex: 1; max-width: 680px; min-width: 220px; }
+.grade-caption-big { font-size: 1rem; font-weight: 600; color: #1f2937; line-height: 1.4; }
+.grade-caption-sub { font-size: 0.8rem; color: #64748b; margin-top: 3px; }
+.scorecard { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: #eef0f3; border: 1px solid #eef0f3; margin: 0.6em 0 1.8em; }
+.kpi { background: #ffffff; padding: 16px 18px 14px; text-align: center; }
+.kpi-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700; }
+.kpi-value { font-size: 1.55rem; font-weight: 600; margin-top: 6px; line-height: 1.1; color: #0a2540; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 0.7rem; color: #64748b; margin-top: 4px; }
+.section-card { background: #ffffff; border: 1px solid #e5e7eb; padding: 22px 28px 24px; margin-bottom: 18px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; margin: 0.5em 0; font-size: 0.84rem; }
+table.dep-tbl { table-layout: fixed; }
+table.dep-tbl td:first-child { white-space: normal; }
+table.dep-tbl td code { word-break: break-all; }
+th, td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
+td:first-child { white-space: nowrap; }
+th { background: #ffffff; font-weight: 700; white-space: nowrap; color: #0a2540; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.7rem; border-bottom: 2px solid #0a2540; }
+tbody tr:last-child td { border-bottom: 1px solid #d1d5db; }
+tbody tr:hover td { background: #f9fafb; }
+th.num, td.num { text-align: center; font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid; }
+.badge-pass { color: #15803d; border-color: #86efac; background: #f0fdf4; }
+.badge-fail { color: #991b1b; border-color: #fca5a5; background: #fef2f2; }
+.badge-warn { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
+.badge-na   { color: #64748b; border-color: #d1d5db; background: #f9fafb; }
+.badge-info { color: #1e3a5f; border-color: #bfdbfe; background: #eff6ff; }
+.score-ok   { color: #15803d; }
+.score-warn { color: #b45309; }
+.score-bad  { color: #991b1b; }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1px; background: #e5e7eb; border: 1px solid #e5e7eb; margin: 10px 0 0; }
+.feature { background: #ffffff; border-left: 2px solid #15803d; padding: 13px 16px 14px 14px; }
+.feature.fail { border-left-color: #991b1b; }
+.feature-title { font-weight: 600; font-size: 0.86rem; color: #0a2540; display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.feature-desc { font-size: 0.8rem; color: #475569; margin: 6px 0 8px; line-height: 1.5; }
+.feature-evidence { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 0.71rem; color: #1f2937; background: #f9fafb; border: 1px solid #e5e7eb; padding: 6px 9px; word-break: break-word; line-height: 1.5; }
+.cat-chip { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 9px; background: #ffffff; color: #0a2540; border: 1px solid #cbd5e1; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 10px; vertical-align: middle; }
+details.log-panel { margin: 0.9em 0 0.4em; }
+details.log-panel summary { cursor: pointer; font-weight: 700; font-size: 0.74rem; color: #1e3a5f; padding: 6px 0; user-select: none; text-transform: uppercase; letter-spacing: 0.07em; }
+details.log-panel summary:hover { text-decoration: underline; }
+pre.log { background: #0f172a; color: #e2e8f0; padding: 14px 16px; font-size: 0.74rem; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; overflow-x: auto; max-height: 380px; white-space: pre; margin: 6px 0 0; border: 1px solid #1e293b; }
+.notice { border-left: 3px solid #b45309; background: #fffbeb; padding: 14px 18px 12px; margin-bottom: 18px; }
+.notice-title { font-size: 0.7rem; font-weight: 700; color: #78350f; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px; }
+.notice p { color: #78350f; font-size: 0.84rem; margin: 0 0 6px; line-height: 1.55; }
+.notice p:last-child { margin-bottom: 0; }
+.method-note { font-size: 0.84rem; color: #1f2937; }
+.method-note ul { margin: 6px 0 0 20px; padding: 0; }
+.method-note li { margin: 4px 0; }
+footer { margin-top: 40px; padding-top: 18px; border-top: 2px solid #0a2540; font-size: 0.72rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; text-align: center; }
+@media print {
+    body { background: #ffffff; font-size: 11pt; }
+    .container { padding: 0; max-width: none; }
+    .section-card, .hero, .feature, .kpi, .hero-stat, .notice { break-inside: avoid; page-break-inside: avoid; }
+    h2, h3 { break-after: avoid; page-break-after: avoid; }
+    pre.log { max-height: none; background: #f3f4f6; color: #0f172a; border-color: #d1d5db; }
+}
+@media (max-width: 720px) {
+    .container { padding: 24px 18px 60px; }
+    h1 { font-size: 1.45rem; }
+    table, .feature-grid { font-size: 0.78rem; }
+    th, td { padding: 6px 8px; }
+    .scorecard, .hero-grid { grid-template-columns: repeat(2, 1fr); }
+    .grade { font-size: 2.6rem; }
+}
+</style>
+</head><body><div class="container">
+<div class="hero">
+  <p class="eyebrow">ASPClassic → Blazor &nbsp;·&nbsp; Modernization Coverage Report &nbsp;·&nbsp; Confidential</p>
+  <h1>Modernization Coverage Analysis</h1>
+  <p class="subtitle">Deterministic, evidence-based coverage analysis comparing <strong>ASPClassic source</strong> against <strong>Blazor target</strong>. Generated 2026-08-18 06:44:19.</p>
+  <div class="grade-row">
+    <div class="grade-block">
+      <div class="grade-label">Overall Grade</div>
+      <span class="grade" style="color:#15803d">A</span>
+      <div class="grade-sub">95.4%</div>
+    </div>
+    <div class="grade-caption">
+      <div class="grade-caption-big">Excellent — comprehensive modernization coverage with all cross-cutting concerns in place.</div>
+      <div class="grade-caption-sub">17 of 17 forms mapped &nbsp;·&nbsp; 34 of 34 methods mapped</div>
+    </div>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-stat"><div class="hero-stat-label">ASPClassic Forms</div><div class="hero-stat-value">17</div><div class="hero-stat-sub">7 modules</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Blazor Pages</div><div class="hero-stat-value">22</div><div class="hero-stat-sub">54 services</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Form Coverage</div><div class="hero-stat-value">100.0%</div><div class="hero-stat-sub">forms mapped</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Method Coverage</div><div class="hero-stat-value">100.0%</div><div class="hero-stat-sub">methods mapped</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Control Coverage</div><div class="hero-stat-value">80.0%</div><div class="hero-stat-sub">controls mapped</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">ASPClassic Methods</div><div class="hero-stat-value">0</div><div class="hero-stat-sub">across 17 forms</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">ASPClassic Controls</div><div class="hero-stat-value">50</div><div class="hero-stat-sub">total controls</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Blazor Models</div><div class="hero-stat-value">54</div><div class="hero-stat-sub">domain entities</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">ASPClassic LOC</div><div class="hero-stat-value">4,632</div><div class="hero-stat-sub">non-blank lines</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Blazor LOC</div><div class="hero-stat-value">17,494</div><div class="hero-stat-sub">non-blank lines</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">ASPClassic Files</div><div class="hero-stat-value">20</div><div class="hero-stat-sub">source files</div></div>
+    <div class="hero-stat"><div class="hero-stat-label">Blazor Files</div><div class="hero-stat-value">150</div><div class="hero-stat-sub">source files</div></div>
+  </div>
+</div>
+<section><h2>Executive Summary</h2>
+<div class="scorecard">
+<div class="kpi"><div class="kpi-label">Form Coverage</div><div class="kpi-value"><span class="score-ok">100.0%</span></div><div class="kpi-sub">17/17</div></div>
+<div class="kpi"><div class="kpi-label">Method Coverage</div><div class="kpi-value"><span class="score-ok">100.0%</span></div><div class="kpi-sub">34/34</div></div>
+<div class="kpi"><div class="kpi-label">Control Coverage</div><div class="kpi-value"><span class="score-ok">80.0%</span></div><div class="kpi-sub">40/50</div></div>
+<div class="kpi"><div class="kpi-label">Mod. Checks</div><div class="kpi-value"><span class="score-ok">16/17</span></div></div>
+<div class="kpi"><div class="kpi-label">Observability</div><div class="kpi-value"><span class="score-warn">2/3</span></div></div>
+<div class="kpi"><div class="kpi-label">Resilience</div><div class="kpi-value"><span class="score-ok">3/3</span></div></div>
+<div class="kpi"><div class="kpi-label">Architecture</div><div class="kpi-value"><span class="score-ok">4/4</span></div></div>
+<div class="kpi"><div class="kpi-label">Security</div><div class="kpi-value"><span class="score-ok">3/3</span></div></div>
+<div class="kpi"><div class="kpi-label">Developer Experience</div><div class="kpi-value"><span class="score-ok">2/2</span></div></div>
+<div class="kpi"><div class="kpi-label">UI Modernization</div><div class="kpi-value"><span class="score-ok">2/2</span></div></div>
+</div>
+</section>
+<section class="section-card"><h2>Form → Page Coverage</h2>
+<p class="meta" style="margin-bottom:14px;">Each ASPClassic form is matched against Blazor pages (.razor) using name similarity, caption/title matching, and token overlap. Confidence ≥ 60% = <span class="badge badge-pass">MAPPED</span>, 30–59% = <span class="badge badge-warn">PARTIAL</span>, < 30% = <span class="badge badge-fail">NOT MAPPED</span>.</p>
+<table><thead><tr>
+<th>ASPClassic Form</th><th>ASPClassic File</th><th>Blazor Page</th><th>Blazor File</th>
+<th class="num">Confidence</th><th class="num">Methods (ASPClassic)</th>
+<th class="num">Method Coverage</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>Admin_Dataviewfields</strong></td><td><code>admin_dataviewfields.asp</code></td><td>/aspclassic-vbscript/admin-dataviewfields</td><td><code>AdminDataviewfields.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Admin_Dataviews</strong></td><td><code>admin_dataviews.asp</code></td><td>/aspclassic-vbscript/admin-dataviews</td><td><code>AdminDataviews.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Ajax_Dataview</strong></td><td><code>ajax_dataview.asp</code></td><td></td><td><code>AjaxDataviewDialog.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Blank</strong></td><td><code>blank.asp</code></td><td>/aspclassic-vbscript/blank</td><td><code>Blank.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Browse</strong></td><td><code>browse.asp</code></td><td>/aspclassic-vbscript/browse</td><td><code>Browse.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Dataview</strong></td><td><code>dataview.asp</code></td><td>/aspclassic-vbscript/dataview</td><td><code>Dataview.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Dataview_Ngdt</strong></td><td><code>dataview_ngdt.asp</code></td><td>/aspclassic-vbscript/dataview-ngdt</td><td><code>DataviewNgdt.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Default</strong></td><td><code>default.asp</code></td><td>/aspclassic-vbscript/default</td><td><code>Default.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>View</strong></td><td><code>view.asp</code></td><td>/aspclassic-vbscript/view</td><td><code>View.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Footer</strong></td><td><code>inc_footer.asp</code></td><td></td><td><code>IncFooterComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Footer_Jscripts</strong></td><td><code>inc_footer_jscripts.asp</code></td><td></td><td><code>IncFooterJscriptsComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Header</strong></td><td><code>inc_header.asp</code></td><td></td><td><code>IncHeaderComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Meta</strong></td><td><code>inc_meta.asp</code></td><td></td><td><code>IncMetaComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Nav_Side</strong></td><td><code>inc_nav_side.asp</code></td><td></td><td><code>IncNavSideComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Inc_Nav_Top</strong></td><td><code>inc_nav_top.asp</code></td><td></td><td><code>IncNavTopComponent.razor</code></td><td class="num">100%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>404</strong></td><td><code>404.asp</code></td><td>/aspclassic-vbscript/page404</td><td><code>Page404.razor</code></td><td class="num">85%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>500</strong></td><td><code>500.asp</code></td><td>/aspclassic-vbscript/page500</td><td><code>Page500.razor</code></td><td class="num">85%</td><td class="num">0</td><td class="num">100.0%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+</tbody></table></section>
+<section class="section-card"><h2>Method-Level Coverage</h2>
+<p class="meta" style="margin-bottom:14px;">Every ASPClassic method/function/property is matched against Blazor page methods and service methods using name normalization, token overlap, and parameter count similarity.</p>
+<h3><span class="cat-chip">DataViewLookupClass</span> 1/1 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (1 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>Init</strong></td><td><code>Public Function Init(pValue, pLabel) As Variant</code></td><td>AdminDataviewfields.razor</td><td>AutoInitFieldsAsync</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">DataViewLookupClassExtendable</span> 5/5 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (5 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>UBound</strong></td><td><code>Public Function UBound() As String</code></td><td>DataViewLookupClassExtendable</td><td>UBoundAsync</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Items</strong></td><td><code>Public Function Items() As Variant</code></td><td>Dataview.razor</td><td>OnSelectedItemsChanged</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>GetProp</strong></td><td><code>Public Function GetProp(pKey) As String</code></td><td>DataViewLookupClassExtendable</td><td>GetProp</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>SetProp</strong></td><td><code>Public Sub SetProp(pKey, pItem) As void</code></td><td>DataViewLookupClassExtendable</td><td>SetProp</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Class_Initialize</strong></td><td><code>Private Sub Class_Initialize() As void</code></td><td>DataviewNgdtEditDialog.razor</td><td>InitializeFieldValues</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">DataViewLookupCollectionClass</span> 6/6 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (6 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>UBound</strong></td><td><code>Public Function UBound() As String</code></td><td>DataViewLookupClassExtendable</td><td>UBoundAsync</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Items</strong></td><td><code>Public Function Items() As String</code></td><td>Dataview.razor</td><td>OnSelectedItemsChanged</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Keys</strong></td><td><code>Public Function Keys() As Variant</code></td><td>DataViewLookupCollectionClass</td><td>KeysAsync</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>GetItem</strong></td><td><code>Public Function GetItem(pKey) As Variant</code></td><td>DataViewLookupCollectionClass</td><td>GetItemByKey</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>AddItem</strong></td><td><code>Public Sub AddItem(pKey, pItem) As void</code></td><td>DataViewLookupCollectionClass</td><td>AddItem</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Class_Initialize</strong></td><td><code>Private Sub Class_Initialize() As void</code></td><td>DataviewNgdtEditDialog.razor</td><td>InitializeFieldValues</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">Inc_Config</span> 1/1 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (1 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>GetConfigValue</strong></td><td><code>Public Function GetConfigValue(sectionName, keyAttrName, valAttrName, attrName,…</code></td><td>IncConfigService</td><td>ResolveConfigValue</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">Inc_Crudeconstants</span> 6/6 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (6 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>InitDataViewFields</strong></td><td><code>Public Function InitDataViewFields(pViewID, pDBConnection) As Variant</code></td><td></td><td>InitDataViewFieldsJSAsync</td><td class="num">64%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>InitDataViewActions</strong></td><td><code>Public Function InitDataViewActions(pViewID, pIsInline, pDBConnection) As Varia…</code></td><td></td><td>InitDataViewActionsAsync</td><td class="num">57%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr>
+<td><strong>AddToBreadCrumbCollection</strong></td><td><code>Public Sub AddToBreadCrumbCollection(pLabel, pURL) As void</code></td><td>IncHeaderComponent.razor.cs</td><td>(referenced)</td><td class="num">55%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr>
+<td><strong>RenderBreadCrumbCollection</strong></td><td><code>Public Sub RenderBreadCrumbCollection() As void</code></td><td>IncHeaderComponent.razor.cs</td><td>(referenced)</td><td class="num">55%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr>
+<td><strong>InitDataViewFieldsJS</strong></td><td><code>Public Sub InitDataViewFieldsJS(ByRef dvFields) As void</code></td><td>AdminDataviewfieldsService</td><td>AutoInitDataViewFieldsAsync</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr>
+<td><strong>InitDataViewInlineActionButtonsJS</strong></td><td><code>Public Sub InitDataViewInlineActionButtonsJS(ByRef dvActionsInline) As void</code></td><td></td><td>InitDataViewInlineActionButtonsJSAsync</td><td class="num">49%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">Inc_Functions</span> 9/9 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (9 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>GetWord</strong></td><td><code>Public Function GetWord(strKey) As String</code></td><td>IncFooterComponent.razor</td><td>GetWord</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>pd</strong></td><td><code>Public Function pd(n, totalDigits) As String</code></td><td>IncFunctionsService</td><td>Pd</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>CIsoDate</strong></td><td><code>Public Function CIsoDate(s_input) As String</code></td><td>IncFunctionsService</td><td>CIsoDate</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>DisplayLookupSelection</strong></td><td><code>Public Sub DisplayLookupSelection(ByVal DBTableName, ByVal DBValueCol, ByVal DB…</code></td><td></td><td>DisplayLookupSelectionAsync</td><td class="num">61%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>GetPageTitle</strong></td><td><code>Public Function GetPageTitle() As String</code></td><td></td><td>GetPageTitleAsync</td><td class="num">61%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>isIsoDate</strong></td><td><code>Public Function isIsoDate(s_input) As String</code></td><td></td><td>isIsoDateAsync</td><td class="num">61%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>AutoFormatLabels</strong></td><td><code>Public Function AutoFormatLabels(colName) As String</code></td><td></td><td>AutoFormatLabelsAsync</td><td class="num">61%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>SetWord</strong></td><td><code>Public Sub SetWord(ByVal strKey, ByVal strValue) As void</code></td><td>AdminDataviews.razor</td><td>IsFlagSet</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr>
+<td><strong>FormatDateForDB</strong></td><td><code>Public Function FormatDateForDB(dt) As String</code></td><td></td><td>FormatDateForDBAsync</td><td class="num">49%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+<h3><span class="cat-chip">SanitizerClass</span> 6/6 mapped (100%)</h3>
+<details class="log-panel"><summary>Method mappings (6 entries)</summary>
+<table><thead><tr>
+<th>ASPClassic Method</th><th>ASPClassic Signature</th><th>Blazor Location</th>
+<th>Blazor Method</th><th class="num">Confidence</th><th>Status</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>HTMLFormControl</strong></td><td><code>Public Function HTMLFormControl(pInput) As String</code></td><td></td><td>HTMLFormControl</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>HTMLDisplay</strong></td><td><code>Public Function HTMLDisplay(pInput) As String</code></td><td></td><td>HTMLDisplay</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Querystring</strong></td><td><code>Public Function Querystring(pInput) As String</code></td><td></td><td>Querystring</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>SQL</strong></td><td><code>Public Function SQL(pInput) As String</code></td><td>AdminDataviewsService</td><td>FormatSqlValue</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>JSON</strong></td><td><code>Public Function JSON(ByVal Str) As String</code></td><td>BasicSmokeTests</td><td>JsonValueFormatter_SanitizeForJson_EscapesQuotes</td><td class="num">70%</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr>
+<td><strong>Class_Initialize</strong></td><td><code>Private Sub Class_Initialize() As void</code></td><td>DataviewNgdtEditDialog.razor</td><td>InitializeFieldValues</td><td class="num">52%</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+</tbody></table></details>
+</section>
+<section class="section-card"><h2>Control → Component Coverage</h2>
+<p class="meta" style="margin-bottom:14px;">ASPClassic UI controls matched to MudBlazor / Blazor component equivalents.</p>
+<table><thead><tr>
+<th>ASPClassic Control Type</th><th class="num">Count</th><th>Blazor Equivalent</th>
+<th class="num">Mapped</th><th class="num">Coverage</th>
+</tr></thead><tbody>
+<tr>
+<td><code>HtmlInput</code></td><td class="num">24</td><td>MudTextField</td><td class="num">24/24</td><td class="num"><span class="score-ok">100%</span></td></tr>
+<tr>
+<td><code>HtmlHidden</code></td><td class="num">10</td><td>(no known mapping)</td><td class="num">0/10</td><td class="num"><span class="score-bad">0%</span></td></tr>
+<tr>
+<td><code>HtmlSelect</code></td><td class="num">7</td><td>MudSelect</td><td class="num">7/7</td><td class="num"><span class="score-ok">100%</span></td></tr>
+<tr>
+<td><code>HtmlCheckBox</code></td><td class="num">4</td><td>MudCheckBox / MudSwitch</td><td class="num">4/4</td><td class="num"><span class="score-ok">100%</span></td></tr>
+<tr>
+<td><code>HtmlTextArea</code></td><td class="num">3</td><td>MudTextField</td><td class="num">3/3</td><td class="num"><span class="score-ok">100%</span></td></tr>
+<tr>
+<td><code>HtmlButton</code></td><td class="num">2</td><td>MudButton</td><td class="num">2/2</td><td class="num"><span class="score-ok">100%</span></td></tr>
+</tbody></table>
+<details class="log-panel"><summary>404 — 2/2 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>search</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>submit</code></td><td>HtmlButton</td><td>MudButton</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>500 — 2/2 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>search</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>submit</code></td><td>HtmlButton</td><td>MudButton</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>Admin_Dataviewfields — 19/22 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>FieldLabel</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>FieldSource</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>FieldType</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>FieldDescription</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DefaultValue</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>MaxLength</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>Width</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>Height</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>UriPath</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>UriStyle</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTable</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableValueField</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableTitleField</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableGroupField</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableGlyphField</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableTooltipField</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>LinkedTableAddition</code></td><td>HtmlTextArea</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>FieldFlags</code></td><td>HtmlCheckBox</td><td>MudCheckBox / MudSwitch</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>ItemID</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>ViewID</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>mode</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>sort_EXPR</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>Admin_Dataviews — 16/18 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>Title</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>Published</code></td><td>HtmlCheckBox</td><td>MudCheckBox / MudSwitch</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>ViewDescription</code></td><td>HtmlTextArea</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DataSource</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>MainTable</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>PrimaryKey</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>OrderBy</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>RowReorderCol</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>ViewProcedure</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>ModificationProcedure</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DeleteProcedure</code></td><td>HtmlInput</td><td>MudTextField</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>Flags</code></td><td>HtmlCheckBox</td><td>MudCheckBox / MudSwitch</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DataTableModificationButtonStyle</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DataTableDefaultPageSize</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DataTablePagingStyle</code></td><td>HtmlSelect</td><td>MudSelect</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>DataTableFlags</code></td><td>HtmlCheckBox</td><td>MudCheckBox / MudSwitch</td><td><span class="badge badge-pass">MAPPED</span></td></tr>
+<tr><td><code>ItemID</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>mode</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>Dataview — 0/2 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>postback</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>mode</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>Dataview_Ngdt — 1/4 controls mapped</summary>
+<table><thead><tr><th>Control Name</th><th>ASPClassic Type</th><th>Blazor Component</th><th>Status</th></tr></thead><tbody>
+<tr><td><code>inputField_EXPR</code></td><td>HtmlTextArea</td><td>MudTextField</td><td><span class="badge badge-warn">PARTIAL</span></td></tr>
+<tr><td><code>postback</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>ItemID</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+<tr><td><code>mode</code></td><td>HtmlHidden</td><td>(no known mapping)</td><td><span class="badge badge-fail">NOT MAPPED</span></td></tr>
+</tbody></table></details>
+</section>
+<section class="section-card"><h2>Modernization Checks</h2>
+<p class="meta" style="margin-bottom:14px;">Cross-cutting concerns evaluated against the Blazor target project. Each check is backed by file-system evidence.</p>
+<h3><span class="cat-chip">Observability</span> 2/3 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>Structured logging (Serilog)</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Serilog registered for structured, queryable logging replacing VB6 Debug.Print/App.LogEvent.</div>
+  <div class="feature-evidence">Program.cs: UseSerilog detected</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Health checks endpoint</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Liveness probe at /health for container orchestrators and monitoring.</div>
+  <div class="feature-evidence">Program.cs: AddHealthChecks detected</div>
+</div>
+<div class="feature fail">
+  <div class="feature-title"><span>ILogger&lt;T&gt; injected into services (24/54)</span><span class="badge badge-fail">FAIL</span></div>
+  <div class="feature-desc">Every service has a structured logging hook.</div>
+  <div class="feature-evidence">24 of 54 services have ILogger</div>
+</div>
+</div>
+<h3><span class="cat-chip">Resilience</span> 3/3 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>Global exception handler</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Unhandled HTTP exceptions routed to error page.</div>
+  <div class="feature-evidence">Program.cs: UseExceptionHandler detected</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Pages implement IDisposable (1/22)</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Pages release resources on circuit disconnect (replaces VB6 Form_Unload).</div>
+  <div class="feature-evidence">1 of 22 pages implement IDisposable</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Async service methods (79/893)</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Async/await replaces VB6 DoEvents and blocking calls.</div>
+  <div class="feature-evidence">79 of 893 service methods are async</div>
+</div>
+</div>
+<h3><span class="cat-chip">Architecture</span> 4/4 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>Dependency injection</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Constructor injection replaces VB6 manual object instantiation (New / CreateObject).</div>
+  <div class="feature-evidence">4 DI registrations found</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Service layer separation</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Business logic extracted from UI into dedicated service classes (replaces code-behind in .frm).</div>
+  <div class="feature-evidence">54 service classes found</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Domain model entities</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Typed entities replace untyped Recordset / DataReader patterns.</div>
+  <div class="feature-evidence">54 domain model classes found</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Multi-project solution</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Separate projects for app and tests (replaces monolithic VB6 .vbp).</div>
+  <div class="feature-evidence">2 .csproj files found</div>
+</div>
+</div>
+<h3><span class="cat-chip">Security</span> 3/3 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>OWASP security headers</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">X-Content-Type-Options, CSP, X-Frame-Options set on every response.</div>
+  <div class="feature-evidence">Security header middleware detected</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Rate limiting</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Per-IP request throttling replaces desktop implicit rate limiting.</div>
+  <div class="feature-evidence">AddRateLimiter detected</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Antiforgery / CSRF protection</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">CSRF tokens on form submissions (not applicable in VB6 desktop).</div>
+  <div class="feature-evidence">AddAntiforgery detected</div>
+</div>
+</div>
+<h3><span class="cat-chip">Developer Experience</span> 2/2 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>Unit test project</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Automated tests replace VB6 manual QA-only testing.</div>
+  <div class="feature-evidence">Test project detected</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>NuGet package management</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Centralized dependency management replaces VB6 OCX registration.</div>
+  <div class="feature-evidence">13 NuGet packages referenced</div>
+</div>
+</div>
+<h3><span class="cat-chip">UI Modernization</span> 2/2 present</h3>
+<div class="feature-grid">
+<div class="feature">
+  <div class="feature-title"><span>MudBlazor component library (48 component types)</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">Rich UI component library replaces VB6 intrinsic/ActiveX controls.</div>
+  <div class="feature-evidence">48 distinct MudBlazor component types used across pages</div>
+</div>
+<div class="feature">
+  <div class="feature-title"><span>Razor page routing (10/22)</span><span class="badge badge-pass">PASS</span></div>
+  <div class="feature-desc">URL-based routing replaces VB6 Form.Show / MDI child windows.</div>
+  <div class="feature-evidence">10 pages have @page route directives</div>
+</div>
+</div>
+</section>
+<section class="section-card"><h2>Dependency Inventory</h2>
+<h3>Blazor NuGet Packages</h3>
+<table><thead><tr><th>Package</th><th>Version</th></tr></thead><tbody>
+<tr><td><code>Microsoft.EntityFrameworkCore</code></td><td><code>10.0.0</code></td></tr>
+<tr><td><code>Microsoft.EntityFrameworkCore.InMemory</code></td><td><code>10.0.0</code></td></tr>
+<tr><td><code>Microsoft.EntityFrameworkCore.Relational</code></td><td><code>10.0.0</code></td></tr>
+<tr><td><code>Microsoft.EntityFrameworkCore.Sqlite</code></td><td><code>10.0.0</code></td></tr>
+<tr><td><code>Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore</code></td><td><code>10.0.0</code></td></tr>
+<tr><td><code>Microsoft.NET.Test.Sdk</code></td><td><code>17.12.0</code></td></tr>
+<tr><td><code>MudBlazor</code></td><td><code>8.0.0</code></td></tr>
+<tr><td><code>Serilog.AspNetCore</code></td><td><code>9.0.0</code></td></tr>
+<tr><td><code>Serilog.Sinks.Console</code></td><td><code>6.0.0</code></td></tr>
+<tr><td><code>Serilog.Sinks.File</code></td><td><code>6.0.0</code></td></tr>
+<tr><td><code>SQLitePCLRaw.bundle_e_sqlite3</code></td><td><code>3.0.4</code></td></tr>
+<tr><td><code>xunit</code></td><td><code>2.9.3</code></td></tr>
+<tr><td><code>xunit.runner.visualstudio</code></td><td><code>2.8.4</code></td></tr>
+</tbody></table>
+</section>
+<section class="section-card"><h2>ASPClassic Source Inventory</h2>
+<table><thead><tr><th>Form / Module</th><th>File</th><th class="num">LOC</th><th class="num">Methods</th><th class="num">Controls</th><th class="num">Events</th></tr></thead><tbody>
+<tr><td><strong>404</strong></td><td><code>404.asp</code></td><td class="num">100</td><td class="num">0</td><td class="num">2</td><td class="num">0</td></tr>
+<tr><td><strong>500</strong></td><td><code>500.asp</code></td><td class="num">63</td><td class="num">0</td><td class="num">2</td><td class="num">0</td></tr>
+<tr><td><strong>Admin_Dataviewfields</strong></td><td><code>admin_dataviewfields.asp</code></td><td class="num">543</td><td class="num">0</td><td class="num">22</td><td class="num">0</td></tr>
+<tr><td><strong>Admin_Dataviews</strong></td><td><code>admin_dataviews.asp</code></td><td class="num">439</td><td class="num">0</td><td class="num">18</td><td class="num">0</td></tr>
+<tr><td><strong>Ajax_Dataview</strong></td><td><code>ajax_dataview.asp</code></td><td class="num">853</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Blank</strong></td><td><code>blank.asp</code></td><td class="num">38</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Browse</strong></td><td><code>browse.asp</code></td><td class="num">307</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Dataview</strong></td><td><code>dataview.asp</code></td><td class="num">483</td><td class="num">0</td><td class="num">2</td><td class="num">0</td></tr>
+<tr><td><strong>Dataview_Ngdt</strong></td><td><code>dataview_ngdt.asp</code></td><td class="num">677</td><td class="num">0</td><td class="num">4</td><td class="num">0</td></tr>
+<tr><td><strong>Default</strong></td><td><code>default.asp</code></td><td class="num">34</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Footer</strong></td><td><code>inc_footer.asp</code></td><td class="num">42</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Footer_Jscripts</strong></td><td><code>inc_footer_jscripts.asp</code></td><td class="num">33</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Header</strong></td><td><code>inc_header.asp</code></td><td class="num">23</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Meta</strong></td><td><code>inc_meta.asp</code></td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Nav_Side</strong></td><td><code>inc_nav_side.asp</code></td><td class="num">30</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>Inc_Nav_Top</strong></td><td><code>inc_nav_top.asp</code></td><td class="num">135</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td><strong>View</strong></td><td><code>view.asp</code></td><td class="num">56</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>DataViewLookupClass</td><td><code>inc_crudeconstants.asp</code></td><td class="num">15</td><td class="num">1</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>DataViewLookupClassExtendable</td><td><code>inc_crudeconstants.asp</code></td><td class="num">27</td><td class="num">5</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>DataViewLookupCollectionClass</td><td><code>inc_crudeconstants.asp</code></td><td class="num">30</td><td class="num">6</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>Inc_Config</td><td><code>inc_config.asp</code></td><td class="num">74</td><td class="num">1</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>Inc_Crudeconstants</td><td><code>inc_crudeconstants.asp</code></td><td class="num">454</td><td class="num">6</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>Inc_Functions</td><td><code>inc_functions.asp</code></td><td class="num">198</td><td class="num">9</td><td class="num">—</td><td class="num">—</td></tr>
+<tr><td>SanitizerClass</td><td><code>inc_functions.asp</code></td><td class="num">72</td><td class="num">6</td><td class="num">—</td><td class="num">—</td></tr>
+<tr style="background:#eff6ff;"><td><strong>Total</strong></td><td></td><td class="num"><strong>4,632</strong></td><td class="num"><strong>34</strong></td><td class="num"><strong>50</strong></td><td class="num"><strong>0</strong></td></tr>
+</tbody></table>
+</section>
+<section class="section-card"><h2>Blazor Target Inventory</h2>
+<table><thead><tr><th>Category</th><th class="num">Files</th><th class="num">Lines (non-blank)</th></tr></thead><tbody>
+<tr><td><strong>Razor Pages</strong></td><td class="num">22</td><td class="num">2,380</td></tr>
+<tr><td><strong>Services</strong></td><td class="num">54</td><td class="num">9,296</td></tr>
+<tr><td><strong>Domain Models</strong></td><td class="num">54</td><td class="num">1,144</td></tr>
+<tr><td><strong>Components (non-page)</strong></td><td class="num">6</td><td class="num">626</td></tr>
+<tr><td><strong>Program / Startup</strong></td><td class="num">1</td><td class="num">218</td></tr>
+<tr style="background:#eff6ff;"><td><strong>Total</strong></td><td class="num"><strong>150</strong></td><td class="num"><strong>17,494</strong></td></tr>
+</tbody></table>
+<details class="log-panel"><summary>Blazor Pages detail</summary>
+<table><thead><tr><th>File</th><th>Route</th><th class="num">LOC</th><th class="num">Methods</th><th>Injections</th><th>Implements</th></tr></thead><tbody>
+<tr><td><code>_Imports.razor</code></td><td></td><td class="num">52</td><td class="num">0</td><td></td><td></td></tr>
+<tr><td><code>AdminDataviewfields.razor</code></td><td>/aspclassic-vbscript/admin-dataviewfields</td><td class="num">180</td><td class="num">29</td><td></td><td></td></tr>
+<tr><td><code>AdminDataviews.razor</code></td><td>/aspclassic-vbscript/admin-dataviews</td><td class="num">325</td><td class="num">28</td><td></td><td></td></tr>
+<tr><td><code>AjaxDataviewDialog.razor</code></td><td></td><td class="num">106</td><td class="num">18</td><td></td><td></td></tr>
+<tr><td><code>App.razor</code></td><td></td><td class="num">17</td><td class="num">0</td><td></td><td></td></tr>
+<tr><td><code>Blank.razor</code></td><td>/aspclassic-vbscript/blank</td><td class="num">21</td><td class="num">5</td><td></td><td></td></tr>
+<tr><td><code>Browse.razor</code></td><td>/aspclassic-vbscript/browse</td><td class="num">264</td><td class="num">30</td><td></td><td></td></tr>
+<tr><td><code>ConfirmDeleteDialog.razor</code></td><td></td><td class="num">10</td><td class="num">2</td><td></td><td></td></tr>
+<tr><td><code>Dataview.razor</code></td><td>/aspclassic-vbscript/dataview</td><td class="num">212</td><td class="num">40</td><td></td><td></td></tr>
+<tr><td><code>DataviewNgdt.razor</code></td><td>/aspclassic-vbscript/dataview-ngdt</td><td class="num">91</td><td class="num">21</td><td></td><td></td></tr>
+<tr><td><code>DataviewNgdtEditDialog.razor</code></td><td></td><td class="num">151</td><td class="num">23</td><td></td><td></td></tr>
+<tr><td><code>Default.razor</code></td><td>/aspclassic-vbscript/default</td><td class="num">58</td><td class="num">7</td><td></td><td></td></tr>
+<tr><td><code>IncFooterComponent.razor</code></td><td></td><td class="num">71</td><td class="num">11</td><td></td><td></td></tr>
+<tr><td><code>IncFooterJscriptsComponent.razor</code></td><td></td><td class="num">7</td><td class="num">6</td><td></td><td></td></tr>
+<tr><td><code>IncHeaderComponent.razor</code></td><td></td><td class="num">21</td><td class="num">6</td><td></td><td></td></tr>
+<tr><td><code>IncMetaComponent.razor</code></td><td></td><td class="num">30</td><td class="num">0</td><td></td><td></td></tr>
+<tr><td><code>IncNavSideComponent.razor</code></td><td></td><td class="num">139</td><td class="num">11</td><td></td><td></td></tr>
+<tr><td><code>IncNavTopComponent.razor</code></td><td></td><td class="num">150</td><td class="num">11</td><td></td><td></td></tr>
+<tr><td><code>MainLayout.razor</code></td><td></td><td class="num">290</td><td class="num">11</td><td>AppState AppState, IIncFunctionsService FunctionsService, NavigationManager NavigationManager, ASPClassic.Application.Services.Dataview.IDataviewService DataviewService</td><td>IDisposable</td></tr>
+<tr><td><code>Page404.razor</code></td><td>/aspclassic-vbscript/page404</td><td class="num">46</td><td class="num">9</td><td></td><td></td></tr>
+<tr><td><code>Page500.razor</code></td><td>/aspclassic-vbscript/page500</td><td class="num">57</td><td class="num">7</td><td></td><td></td></tr>
+<tr><td><code>View.razor</code></td><td>/aspclassic-vbscript/view</td><td class="num">82</td><td class="num">12</td><td></td><td></td></tr>
+</tbody></table></details>
+<details class="log-panel"><summary>Blazor Services detail</summary>
+<table><thead><tr><th>File</th><th>Class</th><th class="num">LOC</th><th class="num">Methods</th><th>Injections</th></tr></thead><tbody>
+<tr><td><code>IAdminDataviewfieldsService.cs</code></td><td></td><td class="num">78</td><td class="num">9</td><td></td></tr>
+<tr><td><code>IAdminDataviewsService.cs</code></td><td></td><td class="num">91</td><td class="num">8</td><td></td></tr>
+<tr><td><code>IAjaxDataview.cs</code></td><td></td><td class="num">23</td><td class="num">4</td><td></td></tr>
+<tr><td><code>IBrowseService.cs</code></td><td></td><td class="num">25</td><td class="num">3</td><td></td></tr>
+<tr><td><code>IDataviewNgdtService.cs</code></td><td></td><td class="num">42</td><td class="num">2</td><td></td></tr>
+<tr><td><code>IDataviewService.cs</code></td><td></td><td class="num">95</td><td class="num">12</td><td></td></tr>
+<tr><td><code>IDataViewLookupClassExtendable.cs</code></td><td></td><td class="num">57</td><td class="num">6</td><td></td></tr>
+<tr><td><code>IDataViewLookupCollectionClass.cs</code></td><td></td><td class="num">59</td><td class="num">8</td><td></td></tr>
+<tr><td><code>IIncConfigService.cs</code></td><td></td><td class="num">29</td><td class="num">0</td><td></td></tr>
+<tr><td><code>IIncCrudeconstantsService.cs</code></td><td></td><td class="num">77</td><td class="num">14</td><td></td></tr>
+<tr><td><code>IIncFunctionsService.cs</code></td><td></td><td class="num">22</td><td class="num">15</td><td></td></tr>
+<tr><td><code>ISanitizerClass.cs</code></td><td></td><td class="num">16</td><td class="num">10</td><td></td></tr>
+<tr><td><code>IPage404Service.cs</code></td><td></td><td class="num">9</td><td class="num">0</td><td></td></tr>
+<tr><td><code>ISanitizerClass.cs</code></td><td></td><td class="num">28</td><td class="num">10</td><td></td></tr>
+<tr><td><code>IViewService.cs</code></td><td></td><td class="num">23</td><td class="num">3</td><td></td></tr>
+<tr><td><code>ASPClassic_Application_Services_Inc_ISanitizerClass.cs</code></td><td></td><td class="num">8</td><td class="num">0</td><td></td></tr>
+<tr><td><code>ASPClassic_Application_Services_Inc_SanitizerClass.cs</code></td><td></td><td class="num">2</td><td class="num">0</td><td></td></tr>
+<tr><td><code>AdminDataviewfieldsService.cs</code></td><td>AdminDataviewfieldsService</td><td class="num">977</td><td class="num">101</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;AdminDataviewfieldsService&gt; _logger, int _currentViewId, int _currentFieldId</td></tr>
+<tr><td><code>AdminDataviewsService.cs</code></td><td>AdminDataviewsService</td><td class="num">872</td><td class="num">75</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;AdminDataviewsService&gt; _logger</td></tr>
+<tr><td><code>AjaxDataview.cs</code></td><td>AjaxDataview</td><td class="num">717</td><td class="num">81</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;AjaxDataview&gt; _logger</td></tr>
+<tr><td><code>AppState.cs</code></td><td>AppState</td><td class="num">48</td><td class="num">3</td><td></td></tr>
+<tr><td><code>ASPClassicVBScriptDbContext.cs</code></td><td>ASPClassicVBScriptDbContext</td><td class="num">273</td><td class="num">1</td><td></td></tr>
+<tr><td><code>AuditEntryDto.cs</code></td><td>AuditEntryDto</td><td class="num">15</td><td class="num">0</td><td></td></tr>
+<tr><td><code>AuditLogger.cs</code></td><td>AuditLogger</td><td class="num">66</td><td class="num">3</td><td>ILogger&lt;AuditLogger&gt; _logger, ConcurrentQueue&lt;AuditEntryDto&gt; _auditStore, long _idCounter</td></tr>
+<tr><td><code>BasicSmokeTests.cs</code></td><td>BasicSmokeTests</td><td class="num">39</td><td class="num">4</td><td></td></tr>
+<tr><td><code>BrowseService.cs</code></td><td>BrowseService</td><td class="num">308</td><td class="num">25</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;BrowseService&gt; _logger</td></tr>
+<tr><td><code>DataViewActionConfiguration.cs</code></td><td>DataViewActionConfiguration</td><td class="num">11</td><td class="num">1</td><td></td></tr>
+<tr><td><code>DataViewActionParametersConfiguration.cs</code></td><td>DataViewActionParametersConfiguration</td><td class="num">11</td><td class="num">1</td><td></td></tr>
+<tr><td><code>DataViewCacheService.cs</code></td><td>DataViewCacheService</td><td class="num">165</td><td class="num">4</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;DataViewCacheService&gt; _logger</td></tr>
+<tr><td><code>DataViewChartConfiguration.cs</code></td><td>DataViewChartConfiguration</td><td class="num">11</td><td class="num">1</td><td></td></tr>
+<tr><td><code>DataViewFieldConfiguration.cs</code></td><td>DataViewFieldConfiguration</td><td class="num">11</td><td class="num">1</td><td></td></tr>
+<tr><td><code>DataViewInfoDto.cs</code></td><td>DataViewInfoDto</td><td class="num">15</td><td class="num">0</td><td></td></tr>
+<tr><td><code>DataViewLookupClassExtendable.cs</code></td><td>DataViewLookupClassExtendable</td><td class="num">213</td><td class="num">16</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;DataViewLookupClassExtendable&gt; _logger, int _count</td></tr>
+<tr><td><code>ASPClassic_Application_Services_Data_DataViewLookupClassExtendable.cs</code></td><td>DataViewLookupClassExtendable</td><td class="num">104</td><td class="num">6</td><td>ILogger&lt;DataViewLookupClassExtendable&gt; _logger, LookupItemDto _item</td></tr>
+<tr><td><code>DataViewLookupCollectionClass.cs</code></td><td>DataViewLookupCollectionClass</td><td class="num">215</td><td class="num">18</td><td>ILogger&lt;DataViewLookupCollectionClass&gt; _logger, List&lt;string&gt; _orderedKeys</td></tr>
+<tr><td><code>DataviewNgdtService.cs</code></td><td>DataviewNgdtService</td><td class="num">921</td><td class="num">114</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;DataviewNgdtService&gt; _logger</td></tr>
+<tr><td><code>DataViewQueryEngine.cs</code></td><td>DataViewQueryEngine</td><td class="num">323</td><td class="num">33</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, DataViewCacheService _cacheService, JsonValueFormatter _jsonFormatter, ILogger&lt;DataViewQueryEngine&gt; _logger</td></tr>
+<tr><td><code>DataViewResultDto.cs</code></td><td>DataViewResultDto</td><td class="num">21</td><td class="num">0</td><td></td></tr>
+<tr><td><code>DataViewSecurityHelper.cs</code></td><td>DataViewSecurityHelper</td><td class="num">51</td><td class="num">3</td><td>ILogger&lt;DataViewSecurityHelper&gt; _logger</td></tr>
+<tr><td><code>DataviewService.cs</code></td><td>DataviewService</td><td class="num">905</td><td class="num">81</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;DataviewService&gt; _logger</td></tr>
+<tr><td><code>IIncFooterJscriptsService.cs</code></td><td>FooterMessageResult</td><td class="num">38</td><td class="num">2</td><td></td></tr>
+<tr><td><code>IncConfigService.cs</code></td><td>IncConfigService</td><td class="num">223</td><td class="num">13</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, IConfiguration _configuration, ILogger&lt;IncConfigService&gt; _logger</td></tr>
+<tr><td><code>IncCrudeconstantsService.cs</code></td><td>IncCrudeconstantsService</td><td class="num">491</td><td class="num">42</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;IncCrudeconstantsService&gt; _logger, DataViewFieldCollectionDto _currentFields, DataViewActionCollectionDto _currentActions</td></tr>
+<tr><td><code>IncFooterJscriptsService.cs</code></td><td>IncFooterJscriptsService</td><td class="num">145</td><td class="num">8</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;IncFooterJscriptsService&gt; _logger, ISnackbar _snackbar</td></tr>
+<tr><td><code>IncFunctionsService.cs</code></td><td>IncFunctionsService</td><td class="num">431</td><td class="num">55</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;IncFunctionsService&gt; _logger, ISanitizerClass _sanitizer, List&lt;LookupSelectionItemDto&gt; _lastLookupItems</td></tr>
+<tr><td><code>JsonValueFormatter.cs</code></td><td>JsonValueFormatter</td><td class="num">82</td><td class="num">6</td><td>ILogger&lt;JsonValueFormatter&gt; _logger</td></tr>
+<tr><td><code>NavigationNodeDto.cs</code></td><td>NavigationNodeDto</td><td class="num">20</td><td class="num">0</td><td></td></tr>
+<tr><td><code>NavigationTreeBuilder.cs</code></td><td>NavigationTreeBuilder</td><td class="num">121</td><td class="num">8</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;NavigationTreeBuilder&gt; _logger</td></tr>
+<tr><td><code>Page404Service.cs</code></td><td>Page404Service</td><td class="num">140</td><td class="num">6</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;Page404Service&gt; _logger</td></tr>
+<tr><td><code>SanitizerClass.cs</code></td><td>SanitizerClass</td><td class="num">191</td><td class="num">41</td><td>ILogger&lt;SanitizerClass&gt; _logger, bool _globalIsAdmin</td></tr>
+<tr><td><code>SanitizerClass.cs</code></td><td>SanitizerClass</td><td class="num">196</td><td class="num">22</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;SanitizerClass&gt; _logger, AppState _appState</td></tr>
+<tr><td><code>SecurityHeadersMiddleware.cs</code></td><td>SecurityHeadersMiddleware</td><td class="num">38</td><td class="num">2</td><td>RequestDelegate _next, ILogger&lt;SecurityHeadersMiddleware&gt; _logger</td></tr>
+<tr><td><code>TriggerRegistry.cs</code></td><td>TriggerRegistry</td><td class="num">78</td><td class="num">0</td><td></td></tr>
+<tr><td><code>ViewService.cs</code></td><td>ViewService</td><td class="num">126</td><td class="num">12</td><td>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt; _dbFactory, ILogger&lt;ViewService&gt; _logger</td></tr>
+</tbody></table></details>
+</section>
+<section class="section-card"><h2>Gap Analysis</h2>
+<details class="log-panel"><summary>Unmapped ASPClassic Controls (10)</summary>
+<pre class="log">
+Admin_Dataviewfields.ItemID (HtmlHidden)
+Admin_Dataviewfields.mode (HtmlHidden)
+Admin_Dataviewfields.ViewID (HtmlHidden)
+Admin_Dataviews.ItemID (HtmlHidden)
+Admin_Dataviews.mode (HtmlHidden)
+Dataview_Ngdt.ItemID (HtmlHidden)
+Dataview_Ngdt.mode (HtmlHidden)
+Dataview_Ngdt.postback (HtmlHidden)
+Dataview.mode (HtmlHidden)
+Dataview.postback (HtmlHidden)
+</pre></details>
+<h3>Additional Blazor Pages (no ASPClassic equivalent)</h3>
+<p class="meta">These Blazor pages do not map to any ASPClassic form — they may be new functionality.</p>
+<p><span class="badge badge-info">NEW</span> <code>App.razor ()</code></p>
+<p><span class="badge badge-info">NEW</span> <code>ConfirmDeleteDialog.razor ()</code></p>
+<p><span class="badge badge-info">NEW</span> <code>DataviewNgdtEditDialog.razor ()</code></p>
+<p><span class="badge badge-info">NEW</span> <code>MainLayout.razor ()</code></p>
+<p><span class="badge badge-info">NEW</span> <code>_Imports.razor ()</code></p>
+</section>
+<section class="section-card"><h2>Methodology &amp; Assurance</h2>
+<div class="method-note">
+<p>Every number, badge and mapping in this report is derived from a deterministic scan of the source trees at generation time. There are no LLM calls, no judgement calls and no cached state. Re-running the tool against the same source produces the same report.</p>
+<ul>
+<li><strong>ASPClassic parsing</strong> — source extraction of forms, controls, methods, and dependencies from the ASPClassic project.</li>
+<li><strong>Blazor parsing</strong> — regex + XML extraction of @page routes, @inject directives, @code methods, service class methods, model properties, .csproj packages, and Program.cs middleware/DI registrations.</li>
+<li><strong>Form mapping</strong> — name normalization (strip common prefixes), caption↔title matching, route matching, and token-overlap scoring with confidence threshold ≥ 30%.</li>
+<li><strong>Method mapping</strong> — name normalization, event-handler decomposition (stripping handler suffixes), token overlap, and parameter-count similarity bonus.</li>
+<li><strong>Control mapping</strong> — dictionary of 35+ ASPClassic control types → MudBlazor equivalents, verified against actual component usage in matched pages.</li>
+<li><strong>Scoring</strong> — weighted: forms 30%, methods 40%, controls 20%, modernization checks 10%. Grade: A ≥ 90%, B ≥ 80%, C ≥ 70%, D ≥ 60%, F &lt; 60%.</li>
+</ul></div></section>
+<footer>ASPClassic → Blazor Modernization Coverage &nbsp;·&nbsp; Generated 2026-08-18 06:44:19 &nbsp;·&nbsp; Confidential</footer>
+</div></body></html>

@@ -1,0 +1,136 @@
+@namespace ASPClassic.Shared
+@using MudBlazor
+
+@* Port of the Summernote editor the legacy used for rich-text fields (field type 14, and 2 where
+   the value is HTML). The toolbar is MudBlazor; only the caret operations are JavaScript, because
+   a selection cannot be manipulated from C#. *@
+
+<div class="rte-frame">
+
+    <MudToolBar Dense="true" Class="rte-toolbar">
+
+        <MudTooltip Text="Bold">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatBold" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("bold"))" />
+        </MudTooltip>
+        <MudTooltip Text="Italic">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatItalic" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("italic"))" />
+        </MudTooltip>
+        <MudTooltip Text="Underline">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatUnderlined" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("underline"))" />
+        </MudTooltip>
+
+        <MudDivider Vertical="true" FlexItem="true" Class="mx-1" />
+
+        @* Font family and size — the "letter type and size" the legacy toolbar offered. *@
+        <MudMenu Icon="@Icons.Material.Filled.FontDownload" Size="Size.Small" Dense="true"
+                 AriaLabel="Font">
+            @foreach (var font in Fonts)
+            {
+                var captured = font;
+                <MudMenuItem OnClick="@(() => ExecAsync("fontName", captured))">
+                    <span style="font-family:@captured">@captured</span>
+                </MudMenuItem>
+            }
+        </MudMenu>
+
+        <MudMenu Icon="@Icons.Material.Filled.FormatSize" Size="Size.Small" Dense="true"
+                 AriaLabel="Size">
+            @* execCommand fontSize takes 1-7, not points — the labels are what those sizes mean. *@
+            @foreach (var (value, label) in Sizes)
+            {
+                var captured = value;
+                <MudMenuItem OnClick="@(() => ExecAsync("fontSize", captured))">@label</MudMenuItem>
+            }
+        </MudMenu>
+
+        <MudDivider Vertical="true" FlexItem="true" Class="mx-1" />
+
+        <MudTooltip Text="Bulleted list">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("insertUnorderedList"))" />
+        </MudTooltip>
+        <MudTooltip Text="Numbered list">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatListNumbered" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("insertOrderedList"))" />
+        </MudTooltip>
+
+        <MudMenu Icon="@Icons.Material.Filled.FormatAlignLeft" Size="Size.Small" Dense="true"
+                 AriaLabel="Alignment">
+            <MudMenuItem OnClick="@(() => ExecAsync("justifyLeft"))">Left</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ExecAsync("justifyCenter"))">Centre</MudMenuItem>
+            <MudMenuItem OnClick="@(() => ExecAsync("justifyRight"))">Right</MudMenuItem>
+        </MudMenu>
+
+        <MudDivider Vertical="true" FlexItem="true" Class="mx-1" />
+
+        <MudTooltip Text="Link">
+            <MudIconButton Icon="@Icons.Material.Filled.Link" Size="Size.Small"
+                           OnClick="OnLinkAsync" />
+        </MudTooltip>
+        <MudTooltip Text="Remove formatting">
+            <MudIconButton Icon="@Icons.Material.Filled.FormatClear" Size="Size.Small"
+                           OnClick="@(() => ExecAsync("removeFormat"))" />
+        </MudTooltip>
+
+        <MudSpacer />
+
+        <MudTooltip Text="@(_sourceMode ? "Back to formatting" : "Edit the HTML")">
+            <MudIconButton Icon="@Icons.Material.Filled.Code" Size="Size.Small"
+                           Color="@(_sourceMode ? Color.Primary : Color.Default)"
+                           OnClick="ToggleSourceAsync" />
+        </MudTooltip>
+    </MudToolBar>
+
+    @if (_sourceMode)
+    {
+        @* The legacy toolbar had a code view too. Anything stored here is rendered as HTML on a
+           page, so being able to see and correct it matters. *@
+        <MudTextField T="string" Value="@Value" ValueChanged="OnSourceChanged"
+                      Lines="10" Variant="Variant.Text" Class="rte-source"
+                      Immediate="false" />
+    }
+    else
+    {
+        <div @ref="_surface"
+             class="rte-surface"
+             contenteditable="true"
+             style="@($"min-height:{MinHeight}")"
+             @oninput="OnSurfaceInput"></div>
+    }
+</div>
+
+<style>
+    .rte-frame {
+        border: 1px solid var(--mud-palette-lines-inputs, #cfd6e4);
+        border-radius: 4px;
+        background: #fff;
+    }
+
+    .rte-toolbar {
+        min-height: 40px;
+        height: auto;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--mud-palette-lines-inputs, #cfd6e4);
+        background: #f7f9fc;
+    }
+
+    .rte-surface {
+        padding: 10px 12px;
+        outline: none;
+        overflow-y: auto;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .rte-surface:focus {
+        background: #fcfdff;
+    }
+
+    .rte-source .mud-input-slot {
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.8125rem;
+    }
+</style>

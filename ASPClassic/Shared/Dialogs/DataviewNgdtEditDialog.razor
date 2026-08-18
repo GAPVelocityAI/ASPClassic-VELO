@@ -1,0 +1,164 @@
+@using ASPClassic.Application.DTOs.Data
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        @if (!string.IsNullOrEmpty(_formError))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-2">
+                @((MarkupString)_formError)
+            </MudAlert>
+        }
+
+        @if (Fields != null)
+        {
+            @for (int idx = 0; idx < Fields.Count; idx++)
+            {
+                var i = idx;
+                var field = Fields[i];
+                var fieldType = field.FieldType ?? string.Empty;
+                var isRequired = (field.FieldFlags & 2) > 0;
+                var isReadOnly = (field.FieldFlags & 4) > 0;
+                var isLink = fieldType == "10";
+
+                @if (!isLink)
+                {
+                    <div class="mb-3" title="@(field.FieldDescription ?? string.Empty)">
+                        @switch (fieldType)
+                        {
+                            case "2": // textarea
+                                <MudTextField T="string" Label="@field.FieldLabel"
+                                              Value="@(GetStringValue(i))"
+                                              ValueChanged="@((string v) => SetStringValue(i, v))"
+                                              Lines="@(field.Height is > 0 ? field.Height.Value : 3)"
+                                              Required="@isRequired" ReadOnly="@isReadOnly"
+                                              Placeholder="@field.FieldLabel"
+                                              Variant="Variant.Outlined" />
+                                break;
+
+                            case "14": // rte (rich text — rendered as textarea in Blazor)
+                                <MudTextField T="string" Label="@field.FieldLabel"
+                                              Value="@(GetStringValue(i))"
+                                              ValueChanged="@((string v) => SetStringValue(i, v))"
+                                              Lines="6"
+                                              Required="@isRequired" ReadOnly="@isReadOnly"
+                                              Variant="Variant.Outlined" />
+                                break;
+
+                            case "5": // combo
+                                <MudSelect T="string" Label="@field.FieldLabel"
+                                           Value="@(GetStringValue(i))"
+                                           ValueChanged="@((string v) => SetStringValue(i, v))"
+                                           Required="@isRequired" Disabled="@isReadOnly"
+                                           Variant="Variant.Outlined" Dense="true">
+                                    @if (_lookupOptions.TryGetValue(i, out var opts))
+                                    {
+                                        @foreach (var opt in opts)
+                                        {
+                                            <MudSelectItem T="string" Value="@opt.Value">@(string.IsNullOrEmpty(opt.Title) ? opt.Value : opt.Title)</MudSelectItem>
+                                        }
+                                    }
+                                </MudSelect>
+                                break;
+
+                            case "6": // multicombo
+                                <MudSelect T="string" Label="@field.FieldLabel"
+                                           Value="@(GetStringValue(i))"
+                                           ValueChanged="@((string v) => SetStringValue(i, v))"
+                                           Required="@isRequired" Disabled="@isReadOnly"
+                                           Variant="Variant.Outlined" Dense="true">
+                                    @if (_lookupOptions.TryGetValue(i, out var mOpts))
+                                    {
+                                        @foreach (var opt in mOpts)
+                                        {
+                                            <MudSelectItem T="string" Value="@opt.Value">@(string.IsNullOrEmpty(opt.Title) ? opt.Value : opt.Title)</MudSelectItem>
+                                        }
+                                    }
+                                </MudSelect>
+                                <MudText Typo="Typo.caption" Class="text-muted">Hold Ctrl to select multiple values</MudText>
+                                break;
+
+                            case "7": // date
+                            case "8": // datetime
+                                <MudDatePicker Label="@field.FieldLabel"
+                                               Date="@(GetDateValue(i))"
+                                               DateChanged="@((DateTime? v) => SetDateValue(i, v))"
+                                               Required="@isRequired" ReadOnly="@isReadOnly"
+                                               Variant="Variant.Outlined" />
+                                break;
+
+                            case "13": // time
+                                <MudTimePicker Label="@field.FieldLabel"
+                                               Time="@(GetTimeValue(i))"
+                                               TimeChanged="@((TimeSpan? v) => SetTimeValue(i, v))"
+                                               Required="@isRequired" ReadOnly="@isReadOnly"
+                                               Variant="Variant.Outlined" />
+                                break;
+
+                            case "9": // boolean
+                                <MudSwitch T="bool" Label="@field.FieldLabel"
+                                           Value="@(GetBoolValue(i))"
+                                           ValueChanged="@((bool v) => SetBoolValue(i, v))"
+                                           Disabled="@isReadOnly"
+                                           Color="Color.Primary" />
+                                break;
+
+                            case "12": // password
+                                <MudTextField T="string" Label="@field.FieldLabel"
+                                              Value="@(GetStringValue(i))"
+                                              ValueChanged="@((string v) => SetStringValue(i, v))"
+                                              InputType="InputType.Password"
+                                              Required="@isRequired" ReadOnly="@isReadOnly"
+                                              Placeholder="@field.FieldLabel"
+                                              MaxLength="@(field.MaxLength is > 0 ? field.MaxLength.Value : 1000)"
+                                              Variant="Variant.Outlined" />
+                                break;
+
+                            case "3": // int
+                            case "4": // double
+                                <MudNumericField T="double?" Label="@field.FieldLabel"
+                                                 Value="@(GetNumericValue(i))"
+                                                 ValueChanged="@((double? v) => SetNumericValue(i, v))"
+                                                 Required="@isRequired" ReadOnly="@isReadOnly"
+                                                 Placeholder="@field.FieldLabel"
+                                                 Variant="Variant.Outlined" />
+                                break;
+
+                            case "15": // email
+                                <MudTextField T="string" Label="@field.FieldLabel"
+                                              Value="@(GetStringValue(i))"
+                                              ValueChanged="@((string v) => SetStringValue(i, v))"
+                                              InputType="InputType.Email"
+                                              Required="@isRequired" ReadOnly="@isReadOnly"
+                                              Placeholder="@field.FieldLabel"
+                                              MaxLength="@(field.MaxLength is > 0 ? field.MaxLength.Value : 1000)"
+                                              Variant="Variant.Outlined" />
+                                break;
+
+                            default: // text (case 1 and others)
+                                <MudTextField T="string" Label="@field.FieldLabel"
+                                              Value="@(GetStringValue(i))"
+                                              ValueChanged="@((string v) => SetStringValue(i, v))"
+                                              Required="@isRequired" ReadOnly="@isReadOnly"
+                                              Placeholder="@field.FieldLabel"
+                                              MaxLength="@(field.MaxLength is > 0 ? field.MaxLength.Value : 1000)"
+                                              Variant="Variant.Outlined" />
+                                break;
+                        }
+                    </div>
+                }
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (Mode != "add" && AllowDelete)
+        {
+            <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="OnDeleteFromEdit"
+                       StartIcon="@Icons.Material.Filled.Delete" Class="mr-auto">
+                Delete
+            </MudButton>
+        }
+        <MudButton OnClick="OnCancel">Close</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="OnSave">Save changes</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,97 @@
+@page "/aspclassic-vbscript/dataview-ngdt"
+
+@using ASPClassic.Application.DTOs.Data
+@using ASPClassic.Application.DTOs.Dataview
+@using ASPClassic.Shared.Dialogs
+
+<!-- Columns: dynamic based on DataViewField definitions with FieldFlags & 8 (Show in List) + Actions -->
+
+@if (_isLoading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="my-2">
+        <MudText Typo="Typo.h6">Critical Error!</MudText>
+        <MudText>@((MarkupString)_errorMessage)</MudText>
+    </MudAlert>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(_successMessage))
+    {
+        <MudAlert Severity="Severity.Success" Class="my-2" CloseIconClicked="() => _successMessage = string.Empty" ShowCloseIcon="true">
+            @_successMessage
+        </MudAlert>
+    }
+
+    <MudPaper Class="pa-2 mb-2" Elevation="0">
+        <MudText Typo="Typo.body2">@((MarkupString)_dataViewDescription)</MudText>
+    </MudPaper>
+
+    <MudPaper Class="pa-2" Elevation="1">
+        <MudToolBar Dense="true" Class="mb-2">
+            @if (_allowInsert)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="OnAddClick" Size="Size.Small">
+                    Add
+                </MudButton>
+            }
+            <MudButton Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Refresh"
+                       OnClick="OnRefreshClick" Size="Size.Small" Class="ml-2">
+                Refresh
+            </MudButton>
+        </MudToolBar>
+
+        @if (_gridRows != null && _visibleFields != null)
+        {
+            <MudDataGrid T="Dictionary<string, object?>" Items="@_gridRows" Dense="true" Hover="true" Bordered="true"
+                         Striped="true" Filterable="@_dtQuickSearch" SortMode="@(_dtSort ? SortMode.Single : SortMode.None)"
+                         RowsPerPage="@_dtDefaultPageSize">
+                <Columns>
+                    @foreach (var field in _visibleFields)
+                    {
+                        var fieldLabel = field.FieldLabel;
+                        <PropertyColumn T="Dictionary<string, object?>" TProperty="string"
+                                        Property="@(x => x.ContainsKey(fieldLabel) && x[fieldLabel] != null ? x[fieldLabel]!.ToString() ?? string.Empty : string.Empty)"
+                                        Title="@fieldLabel" />
+                    }
+                    @if (_showRowActions)
+                    {
+                        <TemplateColumn T="Dictionary<string, object?>" Title="Actions" Sortable="false" Filterable="false">
+                            <CellTemplate>
+                                @if (_allowUpdate)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary"
+                                                   OnClick="@(() => OnEditClick(context.Item))" Title="Edit" />
+                                }
+                                @if (_allowClone)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" Color="Color.Info"
+                                                   OnClick="@(() => OnCloneClick(context.Item))" Title="Clone" />
+                                }
+                                @if (_allowDelete)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                                                   OnClick="@(() => OnDeleteClick(context.Item))" Title="Delete" />
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
+                    }
+                </Columns>
+                <PagerContent>
+                    @if (_dtPagination)
+                    {
+                        <MudDataGridPager T="Dictionary<string, object?>" />
+                    }
+                </PagerContent>
+            </MudDataGrid>
+        }
+        else if (_gridRows != null && _gridRows.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Class="my-2">No records found.</MudAlert>
+        }
+    </MudPaper>
+}

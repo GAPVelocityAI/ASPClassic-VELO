@@ -1,0 +1,37 @@
+@namespace ASPClassic.Pages.Inc
+
+@* /// <summary>Port of <c>Inc_Meta</c> (inc_meta.asp). Provides common meta/head configuration as a reusable component.
+/// In the legacy app this was an SSI include injecting meta tags, CSS, and JS into every page's <head>.
+/// In Blazor Server, global CSS/JS is handled by _Host.cshtml and MudBlazor. This component renders
+/// any dynamic page-level meta content (title, description, viewport overrides) that parent pages need.</summary> *@
+
+<PageTitle>@PageTitle</PageTitle>
+
+@if (!string.IsNullOrEmpty(MetaDescription))
+{
+    <HeadContent>
+        <meta name="description" content="@MetaDescription" />
+    </HeadContent>
+}
+
+@if (!string.IsNullOrEmpty(MetaKeywords))
+{
+    <HeadContent>
+        <meta name="keywords" content="@MetaKeywords" />
+    </HeadContent>
+}
+
+@if (!string.IsNullOrEmpty(CanonicalUrl))
+{
+    <HeadContent>
+        <link rel="canonical" href="@CanonicalUrl" />
+    </HeadContent>
+}
+
+@if (!string.IsNullOrEmpty(AdditionalCss))
+{
+    <HeadContent>
+        <link rel="stylesheet" href="@AdditionalCss" />
+    </HeadContent>
+}
+

@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASPClassic Portal - Technical Documentation</title>
+    <style>
+
+        @page {
+            size: letter;
+            margin: 1in 1in 1.4in 1in;
+            @bottom-center {
+                content: element(footer-running);
+            }
+        }
+
+        @page :first {
+            margin-bottom: 1in;
+            @bottom-center {
+                content: none;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Proxima Nova', Arial, sans-serif;
+            font-size: 11pt;
+            color: #333;
+            line-height: 1.5;
+            max-width: 8.5in;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        /* ── Cover Page ── */
+        .cover-page {
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .cover-decoration {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .cover-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 60px;
+            text-align: center;
+        }
+
+        .cover-logo {
+            width: 320px;
+            margin-bottom: 60px;
+        }
+
+        .cover-title {
+            font-size: 36pt;
+            font-weight: 800;
+            color: #0d7fa5;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .cover-subtitle-2 {
+            font-size: 13pt;
+            color: #0d7fa5;
+            font-weight: 600;
+            margin-bottom: 50px;
+        }
+
+        .cover-meta-table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .cover-meta-table td {
+            padding: 6px 20px;
+            font-size: 11pt;
+        }
+
+        .cover-meta-table td:first-child {
+            font-weight: 700;
+            color: #0d7fa5;
+            text-align: right;
+        }
+
+        .cover-meta-table td:last-child {
+            text-align: left;
+            color: #555;
+        }
+
+        /* ── Running Footer ── */
+        .page-footer {
+            position: running(footer-running);
+        }
+
+        .footer-bar {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .footer-bar img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Print footer simulation for browser view */
+        .footer-print {
+            display: none;
+        }
+
+        /* ── Page content styling ── */
+        .page {
+            page-break-after: always;
+            padding: 0 10px;
+            min-height: auto;
+        }
+
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        h1 {
+            font-size: 22pt;
+            color: #0d7fa5;
+            font-weight: 800;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #0d7fa5;
+            padding-bottom: 4px;
+        }
+
+        h2 {
+            font-size: 15pt;
+            color: #0d7fa5;
+            font-weight: 700;
+            margin-top: 22px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            color: #444;
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 6px;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* ── Tables ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 18px 0;
+            font-size: 10pt;
+        }
+
+        th {
+            background-color: #0d7fa5;
+            color: #fff;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 12px;
+        }
+
+        td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5fafe;
+        }
+
+        /* ── Revision History table ── */
+        .revision-table th {
+            background-color: #0d7fa5;
+        }
+
+        /* ── TOC ── */
+        .toc {
+            margin: 16px 0 20px 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #0d7fa5;
+            display: block;
+            padding: 3px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .toc a:hover {
+            color: #095a75;
+            text-decoration: underline;
+        }
+
+        .toc .toc-l1 {
+            font-weight: 700;
+            padding-left: 0;
+            font-size: 11pt;
+        }
+
+        .toc .toc-l2 {
+            padding-left: 24px;
+            font-size: 10pt;
+            color: #555;
+        }
+
+        /* ── Code blocks ── */
+        code {
+            font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+            background: #f0f4f8;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 9.5pt;
+            color: #1a1a1a;
+        }
+
+        pre {
+            background: #f0f4f8;
+            border: 1px solid #d8e0e8;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 10px 0 16px 0;
+            overflow-x: auto;
+            font-size: 9pt;
+            line-height: 1.45;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* ── Lists ── */
+        ul, ol {
+            margin: 8px 0 12px 28px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        /* ── Final notes box ── */
+        .note-box {
+            background: #f5fafe;
+            border-left: 4px solid #0d7fa5;
+            padding: 14px 18px;
+            margin: 18px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .note-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .warn-box {
+            background: #fff8ec;
+            border-left: 4px solid #d98c0f;
+            padding: 14px 18px;
+            margin: 18px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warn-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ── Property line ── */
+        .property-line {
+            text-align: center;
+            color: #0d7fa5;
+            font-weight: 700;
+            font-size: 10pt;
+            margin-top: 30px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* ── Print styles ── */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .cover-page {
+                min-height: 0;
+                height: auto;
+            }
+            .footer-bar {
+                display: none;
+            }
+            .footer-print {
+                display: block;
+            }
+        }
+
+        /* ── Screen footer (visible in browser) ── */
+        .screen-footer {
+            width: calc(100% + 20px);
+            margin-left: -10px;
+            margin-top: 40px;
+        }
+
+        .screen-footer img {
+            width: 100%;
+            display: block;
+        }
+    
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     COVER PAGE
+     ════════════════════════════════════════════════════════════════ -->
+<div class="cover-page">
+    <img src="images/footer-banner.png" alt="GAP Banner" style="width:100%; display:block;">
+    <img src="images/cover-decoration.png" alt="Decorative network illustration" class="cover-decoration">
+    <div class="cover-content">
+        <img src="images/gap-logo.png" alt="GAP Logo" class="cover-logo">
+        <div class="cover-title">ASPClassic Portal</div>
+        <div class="cover-subtitle">CrudePortal &mdash; Technical Documentation</div>
+        <div class="cover-subtitle-2">ASP Classic / VBScript to Blazor Server Modernization</div>
+        <table class="cover-meta-table">
+            <tr>
+                <td>Date:</td>
+                <td>August 17, 2026</td>
+            </tr>
+            <tr>
+                <td>Classification:</td>
+                <td>Confidential</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     REVISION HISTORY
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1>Revision History</h1>
+    <table class="revision-table">
+        <thead>
+            <tr>
+                <th>Version</th>
+                <th>Change By</th>
+                <th>Description</th>
+                <th>Change Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1.0</td>
+                <td>Jose Pablo Arroyo</td>
+                <td>Initial Version</td>
+                <td>2026-08-17</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ════════════════════════════════════════════════════════════
+         TABLE OF CONTENTS
+         ════════════════════════════════════════════════════════════ -->
+    <h1>Table of Contents</h1>
+    <div class="toc">
+        <a href="#overview" class="toc-l1">1. Overview</a>
+        <a href="#tech-stack" class="toc-l1">2. Technology Stack</a>
+        <a href="#stack-runtime" class="toc-l2">Runtime and UI</a>
+        <a href="#stack-data" class="toc-l2">Data and Diagnostics</a>
+        <a href="#why-blazor" class="toc-l2">Why Blazor Server?</a>
+        <a href="#build-run" class="toc-l1">3. How to Build and Run</a>
+        <a href="#prerequisites" class="toc-l2">Prerequisites</a>
+        <a href="#build-steps" class="toc-l2">Build and Run Steps</a>
+        <a href="#startup-sequence" class="toc-l2">Startup Sequence</a>
+        <a href="#log-files" class="toc-l2">Log Files</a>
+        <a href="#pages-routes" class="toc-l1">4. Pages and Routes</a>
+        <a href="#routing" class="toc-l2">Routing and Navigation</a>
+        <a href="#page-catalog" class="toc-l2">Page Catalog</a>
+        <a href="#shared-components" class="toc-l2">Shared Components and Dialogs</a>
+        <a href="#services" class="toc-l1">5. Services (Business Logic)</a>
+        <a href="#domain-services" class="toc-l2">Data View Services</a>
+        <a href="#include-services" class="toc-l2">Include-Layer Services</a>
+        <a href="#infrastructure" class="toc-l2">Infrastructure</a>
+        <a href="#database" class="toc-l1">6. Database Information</a>
+        <a href="#db-engine" class="toc-l2">Engine and Connection</a>
+        <a href="#db-tables" class="toc-l2">Tables</a>
+        <a href="#metadata-model" class="toc-l2">The Metadata Model</a>
+        <a href="#bitmasks" class="toc-l2">Flag Bitmasks</a>
+        <a href="#security" class="toc-l1">7. Security Configuration</a>
+        <a href="#seed-data" class="toc-l1">8. Data Notes and Seed Data</a>
+        <a href="#legacy-mapping" class="toc-l1">9. Legacy ASP Classic Mapping</a>
+        <a href="#page-mapping" class="toc-l2">Page-to-Component Mapping</a>
+        <a href="#include-mapping" class="toc-l2">Include-to-Service Mapping</a>
+        <a href="#patterns" class="toc-l1">10. Key Modernization Patterns</a>
+        <a href="#final-notes" class="toc-l1">Final Notes</a>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     1. OVERVIEW
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="overview">1. Overview</h1>
+
+    <p><strong>ASPClassic Portal</strong> is a Blazor Server modernization of <strong>CrudePortal</strong>,
+    an ASP Classic / VBScript application built on the AdminLTE template. The original is
+    <strong>4,144 lines</strong> of VBScript across 11 pages and 9 server-side includes; the port is
+    <strong>19,765 lines</strong> of C# and Razor.</p>
+
+    <p>The application is a <strong>metadata-driven CRUD portal</strong>. It has no screens of its own
+    in the usual sense: a screen is a row in a database table. The <code>DataView</code> table names a
+    table to edit, its primary key and what operations are permitted; the <code>DataViewField</code>
+    table names the columns, their labels and how each should be rendered. One generic page reads that
+    metadata and produces the grid, the form, the filters and the buttons. Adding a screen means adding
+    rows, not writing code.</p>
+
+    <div class="note-box">
+        <p><strong>The portal edits itself.</strong> Four built-in views, with negative IDs, point at the
+        portal's own metadata tables: <code>-1</code> Manage Data Views edits <code>DataView</code>,
+        <code>-2</code> Data View Fields edits <code>DataViewField</code>, <code>-3</code> Data View
+        Actions edits <code>DataViewAction</code> and <code>-4</code> Navigation edits
+        <code>Navigation</code>. Understanding this is the single most useful thing when reading either
+        codebase &mdash; the same generic page renders both the application's data and its own
+        configuration.</p>
+    </div>
+
+    <h2>What the port preserves</h2>
+    <p>The metadata model is carried over unchanged, including the exact meaning of every flag bit, the
+    negative IDs of the built-in views, and the placeholder syntax used by action buttons. The
+    <code>portal.*</code> tables, their columns and their seeded rows are reproduced faithfully, so a
+    view defined against the legacy database describes the same screen here.</p>
+
+    <h2>What the port changes</h2>
+    <p>The legacy rendered HTML on the server and relied on jQuery DataTables in the browser for paging,
+    sorting, filtering and export, posting form data back to <code>ajax_dataview.asp</code>. In Blazor
+    Server there is no round trip to cross: the grid is a server-side component, the dialog calls a
+    service directly, and values never become text and are never parsed back. The
+    <code>ajax_dataview.asp</code> endpoint therefore has no equivalent &mdash; its responsibilities are
+    distributed across the services described in section 5.</p>
+</div>
+<!-- ════════════════════════════════════════════════════════════════
+     2. TECHNOLOGY STACK
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="tech-stack">2. Technology Stack</h1>
+
+    <h2 id="stack-runtime">Runtime and UI</h2>
+    <p><code>ASPClassic</code> &mdash; .NET 10 / Blazor Server / MudBlazor 8</p>
+    <table>
+        <thead>
+            <tr><th>Package</th><th>Version</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Microsoft.NET.Sdk.Web</td><td>net10.0</td><td>Razor Pages host plus Blazor Server circuits</td></tr>
+            <tr><td>MudBlazor</td><td>8.0.0</td><td>Component library &mdash; grid, dialogs, form controls, menus</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="stack-data">Data and Diagnostics</h2>
+    <table>
+        <thead>
+            <tr><th>Package</th><th>Version</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Microsoft.EntityFrameworkCore</td><td>10.0.0</td><td>ORM for the typed metadata tables</td></tr>
+            <tr><td>Microsoft.EntityFrameworkCore.Sqlite</td><td>10.0.0</td><td>Database provider</td></tr>
+            <tr><td>Microsoft.EntityFrameworkCore.Relational</td><td>10.0.0</td><td>Raw <code>DbCommand</code> access for dynamic queries</td></tr>
+            <tr><td>SQLitePCLRaw.bundle_e_sqlite3</td><td>3.0.4</td><td>Native SQLite binaries</td></tr>
+            <tr><td>Serilog.AspNetCore</td><td>9.0.0</td><td>Structured logging, configured from <code>appsettings.json</code></td></tr>
+            <tr><td>Serilog.Sinks.File / .Console</td><td>6.0.0</td><td>Rolling file and console sinks</td></tr>
+            <tr><td>Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore</td><td>10.0.0</td><td><code>/health</code> endpoint with a database check</td></tr>
+        </tbody>
+    </table>
+
+    <div class="note-box">
+        <p><strong>EF Core is used for the metadata, not for the data.</strong> The 16 typed entities
+        cover the portal's own configuration tables. The tables a data view <em>edits</em> are unknown
+        at compile time &mdash; <code>MainTable</code> is a string in a database row &mdash; so those
+        are read and written through raw parameterised <code>DbCommand</code>s built from the view
+        definition. The <code>Inventory</code> table used in section 8 has no entity and appears in no
+        <code>DbSet</code>, yet the portal renders, filters, edits and exports it.</p>
+    </div>
+
+    <h2 id="why-blazor">Why Blazor Server?</h2>
+    <p>The legacy is a server-rendered application whose interactivity comes from jQuery plugins
+    operating on HTML the server produced. Blazor Server keeps that shape: rendering stays on the
+    server, state stays in C#, and the browser holds a connection rather than an application. The
+    alternative &mdash; an API plus a SPA &mdash; would have meant inventing a JSON contract for
+    metadata that is only ever consumed by the page that renders it, and reintroducing the parse-and-
+    serialise round trip that <code>ajax_dataview.asp</code> existed to service.</p>
+
+    <p>The cost is that every interaction is a network message, and that a component instance survives
+    a change of query string. Both have consequences that are called out where they arise.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     3. HOW TO BUILD AND RUN
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="build-run">3. How to Build and Run</h1>
+
+    <h2 id="prerequisites">Prerequisites</h2>
+    <ul>
+        <li>.NET 10 SDK</li>
+        <li>Visual Studio 2022 (17.12+) or any editor with the .NET CLI</li>
+        <li>No database server &mdash; SQLite is file-based and the schema is created on first run</li>
+    </ul>
+
+    <h2 id="build-steps">Build and Run Steps</h2>
+    <pre><code>cd ASPClassic
+dotnet build ASPClassic.sln
+dotnet run --project ASPClassic</code></pre>
+
+    <p>Or press <strong>F5</strong> in Visual Studio. The launch profile serves:</p>
+    <table>
+        <thead><tr><th>Scheme</th><th>URL</th></tr></thead>
+        <tbody>
+            <tr><td>HTTPS</td><td><code>https://localhost:7248</code></td></tr>
+            <tr><td>HTTP</td><td><code>http://localhost:5248</code></td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn-box">
+        <p><strong>Port selection is not arbitrary.</strong> Windows reserves blocks of ephemeral ports
+        for Hyper-V and WinNAT, and those reservations are reshuffled on reboot. A port inside a
+        reserved range fails to bind with <code>SocketException 10013</code> &mdash; the host exits
+        before it listens and Visual Studio reports only <em>"unable to connect to web server"</em>.
+        Check with <code>netsh interface ipv4 show excludedportrange protocol=tcp</code> before
+        choosing a port.</p>
+    </div>
+
+    <h2 id="startup-sequence">Startup Sequence</h2>
+    <p><code>Program.cs</code> performs three steps against the database before the pipeline starts:</p>
+    <table>
+        <thead><tr><th>#</th><th>Step</th><th>Detail</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td><code>EnsureCreatedAsync()</code></td><td>Creates the schema from the EF model if the file is absent. No migrations.</td></tr>
+            <tr><td>2</td><td><code>seed-data.sql</code></td><td>The rows harvested from the legacy database project &mdash; the portal's own configuration.</td></tr>
+            <tr><td>3</td><td><code>demo-data.sql</code></td><td>Demonstration content added for this port. Runs after the seed, so it can also remove seeded rows.</td></tr>
+        </tbody>
+    </table>
+
+    <p>Both scripts are executed through a raw <code>DbCommand</code> rather than
+    <code>ExecuteSqlRawAsync</code>. That overload treats its SQL as a composite format string, and
+    seeded values legitimately contain braces &mdash; stored templates such as
+    <code>{{urlparam[dataview[search]]}}</code>. Passed to <code>String.Format</code> they raise
+    <code>FormatException</code> before a single row is written, and the host terminates at startup.</p>
+
+    <p>Deleting <code>aspclassic-dev.db</code> is a safe reset: schema, seed and demo data are all
+    rebuilt on the next start.</p>
+
+    <h2 id="log-files">Log Files</h2>
+    <p>Serilog writes to <code>logs/aspclassic-{Date}.log</code> beside the executable, and to the
+    console. The database check is exposed at <code>/health</code>.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     4. PAGES AND ROUTES
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="pages-routes">4. Pages and Routes</h1>
+
+    <h2 id="routing">Routing and Navigation</h2>
+    <p>Routes are declared with <code>@page</code> on each component and resolved by the Blazor router
+    in <code>App.razor</code>, with <code>MainLayout</code> as the default layout. Legacy page names map
+    to routes by dropping <code>.asp</code> and replacing underscores with hyphens, under the
+    <code>/aspclassic-vbscript</code> prefix.</p>
+
+    <table>
+        <thead><tr><th>Route</th><th>Component</th><th>Legacy page</th></tr></thead>
+        <tbody>
+            <tr><td><code>/</code>, <code>/aspclassic-vbscript</code>, <code>/aspclassic-vbscript/default</code></td><td>Default</td><td><code>default.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/dataview</code></td><td>Dataview</td><td><code>dataview.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/dataview-ngdt</code></td><td>DataviewNgdt</td><td><code>dataview_ngdt.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/browse</code></td><td>Browse</td><td><code>browse.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/admin-dataviews</code></td><td>AdminDataviews</td><td><code>admin_dataviews.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/admin-dataviewfields</code></td><td>AdminDataviewfields</td><td><code>admin_dataviewfields.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/view</code></td><td>View</td><td><code>view.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/blank</code></td><td>Blank</td><td><code>blank.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/page404</code></td><td>Page404</td><td><code>404.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/page500</code></td><td>Page500</td><td><code>500.asp</code></td></tr>
+            <tr><td><code>/aspclassic-vbscript/export/{viewId}</code></td><td>minimal API endpoint</td><td>DataTables client-side export buttons</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn-box">
+        <p><strong>Query-string changes do not re-initialise a component.</strong> Navigating from
+        <code>?ViewID=-2</code> to <code>?ViewID=1</code> is the same page: Blazor reuses the instance
+        and calls <code>OnParametersSetAsync</code>, never <code>OnInitializedAsync</code> again. Every
+        page whose content depends on the query string therefore loads in
+        <code>OnParametersSetAsync</code>, guarded on a signature of its parameters so a render pass
+        does not re-query. Loading from initialisation alone leaves the address bar showing one record
+        and the page showing another, with nothing to indicate a fault.</p>
+    </div>
+
+    <h2 id="page-catalog">Page Catalog</h2>
+
+    <h3>Dataview &mdash; the generic screen</h3>
+    <p>The heart of the application. Given <code>?ViewID=n</code> it loads the view definition, decodes
+    its flag bitmasks, loads the field and action lists, and renders a MudBlazor data grid with a
+    toolbar. Add, edit, clone and delete open <code>AjaxDataviewDialog</code>. Accepts per-column
+    filters as <code>&lt;FieldIdentifier&gt;[search]=value</code>, which is how a shared screen is
+    narrowed to one parent.</p>
+
+    <h3>Browse</h3>
+    <p>The single-record view. Reads the same metadata; redirects to <code>dataview</code> when the
+    view's <em>Enable Browse Module</em> flag (256) is not set, exactly as the legacy did.</p>
+
+    <h3>AdminDataviews / AdminDataviewfields</h3>
+    <p>Typed CRUD screens over <code>DataView</code> and <code>DataViewField</code>, using EF entities
+    rather than the generic engine. <code>AdminDataviewfields</code> also hosts Auto-Initialize, which
+    reads a table's columns and generates the field rows for any not already described.</p>
+
+    <h3>View</h3>
+    <p>Resolves a <code>Navigation</code> entry by <code>NavID</code> and forwards to the view or URI it
+    names.</p>
+
+    <h2 id="shared-components">Shared Components and Dialogs</h2>
+    <table>
+        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+        <tbody>
+            <tr><td><code>MainLayout</code></td><td>Menu bar, toolbar, sidebar and status bar. Hosts the derived Data Views menu.</td></tr>
+            <tr><td><code>IncNavSideComponent</code></td><td>Sidebar. Renders the <code>Navigation</code> tree and, below it, the published non-system views.</td></tr>
+            <tr><td><code>IncHeaderComponent</code>, <code>IncFooterComponent</code>, <code>IncMetaComponent</code>, <code>IncNavTopComponent</code>, <code>IncFooterJscriptsComponent</code></td><td>Ports of the corresponding <code>inc_*.asp</code> includes.</td></tr>
+            <tr><td><code>AjaxDataviewDialog</code></td><td>Add / edit / clone record modal. Renders each field as its declared type and writes the record itself.</td></tr>
+            <tr><td><code>DataviewNgdtEditDialog</code></td><td>Edit modal for the NGDT variant of the grid.</td></tr>
+            <tr><td><code>ConfirmDeleteDialog</code></td><td>Confirmation prompt for destructive actions.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     5. SERVICES
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="services">5. Services (Business Logic)</h1>
+
+    <p>All services are registered <strong>Scoped</strong> in <code>Program.cs</code>. In Blazor Server
+    a Singleton is shared across every user&rsquo;s circuit, so scoped registration is a correctness
+    requirement rather than a preference. Data access uses
+    <code>IDbContextFactory&lt;ASPClassicVBScriptDbContext&gt;</code> and creates a context per
+    operation &mdash; a component&rsquo;s lifetime is not a unit of work.</p>
+
+    <h2 id="domain-services">Data View Services</h2>
+    <table>
+        <thead><tr><th>Service</th><th>Responsibility</th></tr></thead>
+        <tbody>
+            <tr><td><code>IDataviewService</code></td><td>The core. Loads view definitions, fields and actions; reads, writes and deletes records of the view&rsquo;s own table; supplies lookup options and the navigable view list.</td></tr>
+            <tr><td><code>IDataviewNgdtService</code></td><td>Equivalent for the NGDT grid variant.</td></tr>
+            <tr><td><code>IBrowseService</code></td><td>Single-record load for the browse page.</td></tr>
+            <tr><td><code>IAjaxDataview</code></td><td>Port of the <code>ajax_dataview.asp</code> read paths &mdash; view and field metadata for the modal.</td></tr>
+            <tr><td><code>IAdminDataviewsService</code></td><td>Typed CRUD over <code>DataView</code>.</td></tr>
+            <tr><td><code>IAdminDataviewfieldsService</code></td><td>Typed CRUD over <code>DataViewField</code>, plus Auto-Initialize table introspection.</td></tr>
+            <tr><td><code>IDataViewLookupClassExtendable</code>, <code>IDataViewLookupCollectionClass</code></td><td>Ports of the legacy VBScript lookup classes.</td></tr>
+        </tbody>
+    </table>
+
+    <h3>The write path</h3>
+    <p><code>SaveDataviewRecordAsync</code> composes a parameterised <code>INSERT</code> or
+    <code>UPDATE</code> against the view&rsquo;s <code>MainTable</code>. Values are always parameters;
+    table and column names come from the view definition and are checked against the view&rsquo;s own
+    field list, so nothing supplied by a request can reach the statement as SQL. The view&rsquo;s Allow
+    Add and Allow Edit flags are enforced here, and a statement affecting zero rows is reported as a
+    failure rather than a success.</p>
+
+    <p>On insert, a blank optional field is <em>omitted from the statement</em> rather than written as
+    <code>NULL</code>. The legacy opened the row with <code>AddNew</code> and set only what was posted,
+    letting the column&rsquo;s DDL default apply; writing <code>NULL</code> explicitly defeats that
+    default and fails outright on a NOT NULL column that has one.</p>
+
+    <h2 id="include-services">Include-Layer Services</h2>
+    <table>
+        <thead><tr><th>Service</th><th>Legacy include</th></tr></thead>
+        <tbody>
+            <tr><td><code>IIncConfigService</code></td><td><code>inc_config.asp</code> &mdash; configuration lookup</td></tr>
+            <tr><td><code>IIncFunctionsService</code></td><td><code>inc_functions.asp</code> &mdash; shared helpers</td></tr>
+            <tr><td><code>IIncCrudeconstantsService</code></td><td><code>inc_crudeconstants.asp</code> &mdash; constants and breadcrumb state</td></tr>
+            <tr><td><code>IIncFooterJscriptsService</code></td><td><code>inc_footer_jscripts.asp</code></td></tr>
+            <tr><td><code>ISanitizerClass</code></td><td>The VBScript Sanitizer class &mdash; HTML form, HTML display and querystring encoding</td></tr>
+            <tr><td><code>IPage404Service</code></td><td><code>404.asp</code></td></tr>
+            <tr><td><code>IViewService</code></td><td><code>view.asp</code></td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="infrastructure">Infrastructure</h2>
+    <table>
+        <thead><tr><th>Type</th><th>Role</th></tr></thead>
+        <tbody>
+            <tr><td><code>DataViewQueryEngine</code></td><td>Builds and runs the dynamic grid query: paging, global search, per-column filters, ordering. Always selects the primary key, even when it is not a displayed column, so a row can identify itself.</td></tr>
+            <tr><td><code>DataViewCacheService</code></td><td>Caches view definitions and their field lists.</td></tr>
+            <tr><td><code>NavigationTreeBuilder</code></td><td>Builds the sidebar tree from the flat <code>Navigation</code> table. Uses <code>ILookup</code>, not <code>Dictionary</code> &mdash; a top-level item&rsquo;s parent is <code>null</code>, and a dictionary rejects a null key on both <code>Add</code> and <code>TryGetValue</code>. Items naming a parent that does not exist are surfaced at the top level rather than silently dropped.</td></tr>
+            <tr><td><code>AppState</code></td><td>Per-circuit UI state and the command channel between layout and pages.</td></tr>
+            <tr><td><code>JsonValueFormatter</code></td><td>Port of the legacy <code>portal.FormatValueForJson</code> function.</td></tr>
+            <tr><td><code>AuditLogger</code></td><td>Structured audit entries. New in the port.</td></tr>
+            <tr><td><code>DataViewSecurityHelper</code></td><td>Hook for per-view access rules. Currently permits everything, matching the legacy&rsquo;s open access.</td></tr>
+            <tr><td><code>SecurityHeadersMiddleware</code></td><td>Response security headers. New in the port.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     6. DATABASE
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="database">6. Database Information</h1>
+
+    <h2 id="db-engine">Engine and Connection</h2>
+    <p>The legacy runs on <strong>SQL Server</strong>, defined by the <code>CrudePortalDB</code>
+    database project. The port uses <strong>SQLite</strong>, so the demonstration is self-contained and
+    needs no server.</p>
+
+    <table>
+        <thead><tr><th>Environment</th><th>Connection</th></tr></thead>
+        <tbody>
+            <tr><td>Development</td><td><code>Data Source=aspclassic-dev.db</code></td></tr>
+            <tr><td>Production</td><td><code>Data Source=aspclassic.db</code></td></tr>
+        </tbody>
+    </table>
+
+    <div class="note-box">
+        <p>The two environments use <strong>different database files</strong>. Running with
+        <code>--no-launch-profile</code> omits <code>ASPNETCORE_ENVIRONMENT=Development</code> and
+        therefore opens the production file, which is a common source of &ldquo;my data
+        disappeared&rdquo;.</p>
+    </div>
+
+    <p>The legacy <code>portal</code> schema prefix is dropped: <code>portal.DataView</code> becomes
+    <code>DataView</code>. Schema-qualified names stored <em>in the data</em> &mdash;
+    <code>MainTable</code>, <code>LinkedTable</code> &mdash; are reduced to their bare name at the point
+    of use, so seeded rows work unmodified.</p>
+
+    <h2 id="db-tables">Tables</h2>
+    <table>
+        <thead><tr><th>Table</th><th>Cols</th><th>Purpose</th></tr></thead>
+        <tbody>
+            <tr><td><code>DataView</code></td><td>19</td><td>One row per screen</td></tr>
+            <tr><td><code>DataViewField</code></td><td>24</td><td>One row per column on a screen</td></tr>
+            <tr><td><code>DataViewAction</code></td><td>15</td><td>Toolbar and per-row buttons</td></tr>
+            <tr><td><code>DataViewActionParameters</code></td><td>15</td><td>Parameters for procedure-backed actions</td></tr>
+            <tr><td><code>DataViewChart</code></td><td>9</td><td>Chart definitions</td></tr>
+            <tr><td><code>Navigation</code></td><td>9</td><td>The curated sidebar menu tree</td></tr>
+            <tr><td colspan="3" style="background:#f4f7fa"><strong>Lookup tables</strong> &mdash; in the legacy these are <em>views over literal VALUES lists</em>, materialised here as tables</td></tr>
+            <tr><td><code>DataViewFieldTypes</code></td><td>5</td><td>29 field types</td></tr>
+            <tr><td><code>DataViewFieldFlags</code></td><td>4</td><td>5 field flag bits</td></tr>
+            <tr><td><code>DataViewFlags</code></td><td>4</td><td>9 view flag bits</td></tr>
+            <tr><td><code>DataViewDataTableFlags</code></td><td>5</td><td>17 grid feature bits</td></tr>
+            <tr><td><code>DataViewUriStyles</code></td><td>5</td><td>7 link styles</td></tr>
+            <tr><td><code>DataViewActionTypes</code></td><td>3</td><td>4 action types</td></tr>
+            <tr><td><code>DataViewChartTypes</code></td><td>3</td><td>4 chart types</td></tr>
+            <tr><td><code>DataViewPagingTypes</code></td><td>3</td><td>6 paging styles</td></tr>
+            <tr><td><code>DataViewModifierButtonStyles</code></td><td>6</td><td>6 button styles</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="metadata-model">The Metadata Model</h2>
+    <p>Three columns carry most of the meaning, and conflating them is the most common mistake when
+    working on this application:</p>
+
+    <table>
+        <thead><tr><th>Column</th><th>Is</th><th>Is not</th></tr></thead>
+        <tbody>
+            <tr><td><code>DataView.MainTable</code></td><td>The table the screen edits</td><td>Created by the portal &mdash; it must already exist</td></tr>
+            <tr><td><code>DataViewField.FieldSource</code></td><td>The <strong>database column</strong></td><td>The name used in URLs or form inputs</td></tr>
+            <tr><td><code>DataViewField.FieldIdentifier</code></td><td>The <strong>client-side name</strong> &mdash; the form input and the grid column name, and what a <code>[search]</code> URL parameter refers to</td><td>A database column</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn-box">
+        <p><strong>A field describes a column; it does not create one.</strong> There is no
+        <code>ALTER TABLE</code> anywhere in the legacy application. Adding a field for a column that
+        does not exist is accepted by both the legacy and this port, and fails later on the first
+        insert that names it. Add the column to the table first, then describe it &mdash; by hand or
+        with Auto-Initialize.</p>
+    </div>
+
+    <h2 id="bitmasks">Flag Bitmasks</h2>
+    <p>The lookup tables are authoritative for these values, and the legacy code agrees with them
+    throughout.</p>
+
+    <h3><code>DataViewField.FieldFlags</code></h3>
+    <table>
+        <thead><tr><th>Bit</th><th>Meaning</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>Show in Form</td></tr>
+            <tr><td>2</td><td>Required</td></tr>
+            <tr><td>4</td><td>Read Only</td></tr>
+            <tr><td>8</td><td>Show in Items List</td></tr>
+            <tr><td>16</td><td>Show in Search</td></tr>
+        </tbody>
+    </table>
+
+    <h3><code>DataView.Flags</code></h3>
+    <table>
+        <thead><tr><th>Bit</th><th>Meaning</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>Allow Edit</td></tr>
+            <tr><td>2</td><td>Allow Add</td></tr>
+            <tr><td>4</td><td>Allow Delete</td></tr>
+            <tr><td>8</td><td>Allow Clone</td></tr>
+            <tr><td>16</td><td>Enable Form</td></tr>
+            <tr><td>32</td><td>Enable Items List</td></tr>
+            <tr><td>64</td><td>Enable Charts</td></tr>
+            <tr><td>128</td><td>Enable Custom Actions</td></tr>
+            <tr><td>256</td><td>Enable Browse Module</td></tr>
+        </tbody>
+    </table>
+
+    <div class="note-box">
+        <p>There is no sixth or seventh field flag, and no &ldquo;allow search&rdquo; or
+        &ldquo;RTE&rdquo; view flag. A decode that invents bits 32 and 64 for fields is reading a
+        different vocabulary from the one the database declares, and will silently mis-render every
+        screen.</p>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     7. SECURITY
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="security">7. Security Configuration</h1>
+
+    <p>The legacy application has <strong>no authentication and no authorization</strong>: every page is
+    open, and there are no access checks on a data view or an action. The port does not invent a
+    security model it cannot verify against the original, but it does close the gaps that a dynamic-SQL
+    application creates.</p>
+
+    <table>
+        <thead><tr><th>Concern</th><th>Treatment</th></tr></thead>
+        <tbody>
+            <tr><td>SQL injection</td><td>Every value is a parameter. Table and column names come from the view definition, never from a request, and are checked against the view&rsquo;s declared field list before use.</td></tr>
+            <tr><td>Permission flags</td><td>Allow Add, Allow Edit and Allow Delete are enforced in the service, not only in the toolbar. A hidden button is not a permission check.</td></tr>
+            <tr><td>Rate limiting</td><td>Fixed window, 200 requests per minute, partitioned by user or host. Returns HTTP 429.</td></tr>
+            <tr><td>Antiforgery</td><td><code>AddAntiforgery()</code> registered.</td></tr>
+            <tr><td>Security headers</td><td><code>SecurityHeadersMiddleware</code>. New in the port.</td></tr>
+            <tr><td>Access control</td><td><code>DataViewSecurityHelper</code> is a hook for per-view rules. It currently permits everything, matching legacy behaviour.</td></tr>
+            <tr><td>Audit</td><td><code>AuditLogger</code> records structured entries. New in the port.</td></tr>
+            <tr><td>HTML encoding</td><td><code>SanitizerClass</code> ports the legacy encoders for form, display and querystring contexts.</td></tr>
+        </tbody>
+    </table>
+
+    <div class="warn-box">
+        <p><strong>Before this is exposed to anyone, authentication and per-view authorization have to
+        be added.</strong> A metadata-driven portal is, by construction, a general-purpose editor for
+        whatever tables its metadata names &mdash; including its own configuration. The
+        <code>DataViewSecurityHelper</code> hook exists for exactly this and is deliberately left
+        permissive so that no false impression of protection is created.</p>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     8. DATA NOTES AND SEED DATA
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="seed-data">8. Data Notes and Seed Data</h1>
+
+    <p>Two scripts populate the database at startup, in order, and they have different owners and
+    different rules.</p>
+
+    <h2><code>seed-data.sql</code> &mdash; harvested, regenerated</h2>
+    <p>The rows the legacy database deploys with: <strong>169 rows across 13 tables</strong>, taken from
+    the <code>CrudePortalDB</code> post-deployment script and from the lookup views. These are not
+    sample data &mdash; they are the application&rsquo;s own configuration. Without them a
+    metadata-driven portal starts, serves every route and renders nothing at all, with no error to
+    explain it, because an empty table is not a fault.</p>
+
+    <p>The file is regenerated by the migration tooling on every run, so it must not be hand-edited.
+    Its statements are guarded &mdash; each row is written only if its key is absent &mdash; and
+    nothing is deleted, so re-running is harmless and rows added since are never touched.</p>
+
+    <div class="note-box">
+        <p>The lookup tables are the interesting case. In the legacy they are <strong>views over
+        literal <code>VALUES</code> lists</strong>: there is no table underneath and nothing ever
+        inserts into them, so the rows <em>are</em> the definition. Materialised here as ordinary
+        tables, their rows have to come from somewhere, and that source is the view definition itself.
+        Their column types are inferred from the literals &mdash; an unquoted <code>1</code> is a
+        number and <code>'Text'</code> is not &mdash; because typing them all as text would leave every
+        lookup&rsquo;s identifier a string while the column that stores it is an integer, and the two
+        could never be joined.</p>
+    </div>
+
+    <h2><code>demo-data.sql</code> &mdash; hand-written, permanent</h2>
+    <p>Demonstration content added for this port, kept separate precisely because the harvested seed is
+    overwritten. It runs after the seed, so it can also remove seeded rows.</p>
+
+    <table>
+        <thead><tr><th>Content</th><th>Purpose</th></tr></thead>
+        <tbody>
+            <tr><td><code>Demo &mdash; Navigation Links</code> (view 1)</td><td>An ordinary view over <code>Navigation</code>, for exercising add, edit and delete against a table nothing depends on.</td></tr>
+            <tr><td><code>Inventory</code> table + 3 rows</td><td>A worked example of a screen over a business table. Has no EF entity and appears in no <code>DbSet</code>.</td></tr>
+            <tr><td><code>Inventory</code> view (view 2) + 6 fields</td><td>The screen definition over that table.</td></tr>
+            <tr><td><code>Location</code> column, deliberately undescribed</td><td>A column with no field row, so Auto-Initialize has visible work to do.</td></tr>
+            <tr><td>Removal of the Auto-Init action</td><td>A requested divergence, recorded as one.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Adding a screen: the whole flow</h2>
+    <table>
+        <thead><tr><th>Step</th><th>Where</th><th>What</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>Database</td><td>Create the table. The portal never issues DDL.</td></tr>
+            <tr><td>2</td><td>Manage Data Views</td><td>Add a row naming <code>MainTable</code> and <code>Primarykey</code>, and set the permission flags. It appears in the sidebar once published.</td></tr>
+            <tr><td>3</td><td>Manage Fields</td><td>Describe the columns &mdash; by hand, or with Auto-Initialize, which reads the table and generates a row per column not already described.</td></tr>
+            <tr><td>4</td><td>Manage Fields</td><td>Adjust labels, set <em>Show in Items List</em> for grid columns, and point lookup fields at their linked table.</td></tr>
+        </tbody>
+    </table>
+
+    <p>Auto-Initialize infers the field type from the column type and marks NOT NULL columns required.
+    It does not set <em>Show in Items List</em>, so a generated field appears in the form but not the
+    grid until that is ticked.</p>
+
+    <div class="note-box">
+        <p><strong>A SQLite fidelity note.</strong> The legacy maps <code>%char</code> to Text and
+        <code>%text</code> to Text Area. SQLite reports both as <code>TEXT</code>, so Auto-Initialize
+        produces Text Area for every textual column. The field type is easily changed afterwards, but
+        the divergence is a property of the target database, not of the port.</p>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     9. LEGACY MAPPING
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="legacy-mapping">9. Legacy ASP Classic Mapping</h1>
+
+    <h2 id="page-mapping">Page-to-Component Mapping</h2>
+    <table>
+        <thead><tr><th>Legacy page</th><th>Lines</th><th>Blazor component</th><th>Notes</th></tr></thead>
+        <tbody>
+            <tr><td><code>default.asp</code></td><td>&mdash;</td><td><code>Default.razor</code></td><td>Landing page</td></tr>
+            <tr><td><code>dataview.asp</code></td><td>~560</td><td><code>Dataview.razor</code></td><td>The generic screen. Largest single port.</td></tr>
+            <tr><td><code>dataview_ngdt.asp</code></td><td>&mdash;</td><td><code>DataviewNgdt.razor</code></td><td>Alternate grid variant</td></tr>
+            <tr><td><code>browse.asp</code></td><td>~250</td><td><code>Browse.razor</code></td><td>Single-record view</td></tr>
+            <tr><td><code>admin_dataviews.asp</code></td><td>&mdash;</td><td><code>AdminDataviews.razor</code></td><td>Typed CRUD over <code>DataView</code></td></tr>
+            <tr><td><code>admin_dataviewfields.asp</code></td><td>~300</td><td><code>AdminDataviewfields.razor</code></td><td>Typed CRUD over <code>DataViewField</code> + Auto-Initialize</td></tr>
+            <tr><td><code>view.asp</code></td><td>&mdash;</td><td><code>View.razor</code></td><td>Navigation resolver</td></tr>
+            <tr><td><code>blank.asp</code></td><td>&mdash;</td><td><code>Blank.razor</code></td><td>Template page</td></tr>
+            <tr><td><code>404.asp</code> / <code>500.asp</code></td><td>&mdash;</td><td><code>Page404</code> / <code>Page500</code></td><td>Error pages</td></tr>
+            <tr><td><code>ajax_dataview.asp</code></td><td>~700</td><td><em>no equivalent page</em></td><td>The AJAX endpoint. Its work &mdash; read, insert, update, delete, reorder, auto-init &mdash; is distributed across the services.</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="include-mapping">Include-to-Service Mapping</h2>
+    <p>The legacy&rsquo;s nine <code>inc_*.asp</code> includes become either components (when they
+    rendered markup) or scoped services (when they held logic).</p>
+
+    <table>
+        <thead><tr><th>Legacy include</th><th>Becomes</th><th>Kind</th></tr></thead>
+        <tbody>
+            <tr><td><code>inc_nav_side.asp</code></td><td><code>IncNavSideComponent</code></td><td>Component</td></tr>
+            <tr><td><code>inc_nav_top.asp</code></td><td><code>IncNavTopComponent</code></td><td>Component</td></tr>
+            <tr><td><code>inc_header.asp</code></td><td><code>IncHeaderComponent</code></td><td>Component</td></tr>
+            <tr><td><code>inc_footer.asp</code></td><td><code>IncFooterComponent</code></td><td>Component</td></tr>
+            <tr><td><code>inc_meta.asp</code></td><td><code>IncMetaComponent</code></td><td>Component</td></tr>
+            <tr><td><code>inc_footer_jscripts.asp</code></td><td><code>IncFooterJscriptsComponent</code> + service</td><td>Both</td></tr>
+            <tr><td><code>inc_config.asp</code></td><td><code>IIncConfigService</code></td><td>Service</td></tr>
+            <tr><td><code>inc_functions.asp</code></td><td><code>IIncFunctionsService</code></td><td>Service</td></tr>
+            <tr><td><code>inc_crudeconstants.asp</code></td><td><code>IIncCrudeconstantsService</code></td><td>Service</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Database object mapping</h2>
+    <table>
+        <thead><tr><th>Legacy object</th><th>Becomes</th></tr></thead>
+        <tbody>
+            <tr><td><code>portal.GetDataViewContents</code>, <code>portal.GetDataViewDataTableCommand</code></td><td><code>DataViewQueryEngine</code></td></tr>
+            <tr><td><code>portal.AutoInitDataViewFields</code></td><td><code>AdminDataviewfieldsService.PerformAutoInitAsync</code>, using <code>PRAGMA table_info</code> in place of <code>sys.columns</code></td></tr>
+            <tr><td><code>portal.GetNavigationRecursive</code></td><td><code>NavigationTreeBuilder</code></td></tr>
+            <tr><td><code>portal.FormatValueForJson</code></td><td><code>JsonValueFormatter</code></td></tr>
+            <tr><td><code>dbo.GetDataViewLabel</code></td><td>Computed at read time; the legacy&rsquo;s computed column <code>DataViewAction.DataViewTitle</code></td></tr>
+            <tr><td>Lookup views (9)</td><td>Tables, seeded from the <code>VALUES</code> lists in their definitions</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     10. PATTERNS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="patterns">10. Key Modernization Patterns</h1>
+
+    <h2>Dynamic SQL from metadata &rarr; parameterised <code>DbCommand</code></h2>
+    <p>The legacy built SQL by string concatenation from view metadata. The port keeps the dynamic
+    shape &mdash; it must, since the table is a value in a row &mdash; but separates the two kinds of
+    input. Identifiers come from the view definition and are validated against its declared field list;
+    values are always parameters. The distinction is what makes a metadata-driven query safe.</p>
+
+    <h2>ADO updatable recordset &rarr; composed INSERT / UPDATE</h2>
+    <p><code>rsItems.AddNew</code>, field assignment, <code>rsItems.Update</code> becomes a composed
+    statement. The subtlety is that a recordset only sets what you assign, so unassigned columns take
+    their DDL default &mdash; behaviour reproduced by omitting blank optional fields from the insert
+    rather than writing <code>NULL</code>.</p>
+
+    <h2>DataTables client-side grid &rarr; server-side component</h2>
+    <p>Paging, sorting, filtering and search move from jQuery DataTables into
+    <code>DataViewQueryEngine</code>, executed as SQL. The URL contract is preserved:
+    <code>&lt;FieldIdentifier&gt;[search]=value</code> still filters a named column, which is how the
+    Fields and Actions buttons scope a shared screen to one parent view.</p>
+
+    <h2>Placeholder expressions &rarr; resolved server-side</h2>
+    <p>Action URLs stored in the database use <code>{{row[Column]}}</code> and
+    <code>{{urlparam[name]}}</code>, resolved in the browser by the legacy&rsquo;s JavaScript. They are
+    now resolved on the server against the clicked row and the current address, and legacy
+    <code>*.asp</code> targets are translated to routes.</p>
+
+    <h2>DataTables export buttons &rarr; HTTP endpoint</h2>
+    <p>Export moves to <code>/aspclassic-vbscript/export/{viewId}</code>, because a Blazor circuit is a
+    websocket and cannot hand the browser a file. The current filters travel with the request, so the
+    file matches what the screen is showing. Excel receives SpreadsheetML with numeric cells typed as
+    numbers; CSV carries a UTF-8 BOM so Excel reads the encoding rather than guessing.</p>
+
+    <h2><code>Response.Redirect</code> &rarr; <code>NavigationManager</code></h2>
+    <div class="warn-box">
+        <p>Blazor performs a redirect by <strong>throwing</strong>
+        <code>NavigationException</code>, which the framework catches. A page that wraps its load in
+        <code>catch (Exception)</code> &mdash; the natural shape when porting error handling around a
+        <code>Response.Redirect</code> &mdash; intercepts that first: the redirect never happens and
+        the page reports a failure for something that worked. Every such handler is filtered with
+        <code>when (ex is not NavigationException)</code>.</p>
+    </div>
+
+    <h2>Server-side includes &rarr; components and services</h2>
+    <p>An include that rendered markup becomes a component; one that held logic becomes a scoped
+    service. Where an include did both, it becomes both.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FINAL NOTES
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page">
+    <h1 id="final-notes">Final Notes</h1>
+
+    <h2>Modernization Summary</h2>
+    <table>
+        <thead><tr><th>Metric</th><th>Legacy</th><th>Port</th></tr></thead>
+        <tbody>
+            <tr><td>Language</td><td>VBScript / ASP Classic</td><td>C# 13 / Razor / .NET 10</td></tr>
+            <tr><td>Lines of code</td><td>4,144</td><td>19,765</td></tr>
+            <tr><td>Pages</td><td>11 <code>.asp</code></td><td>10 routable components</td></tr>
+            <tr><td>Includes</td><td>9 <code>inc_*.asp</code></td><td>6 components + 7 services</td></tr>
+            <tr><td>Database</td><td>SQL Server</td><td>SQLite</td></tr>
+            <tr><td>Metadata tables</td><td>6 tables + 9 lookup views</td><td>15 tables, 16 EF entities</td></tr>
+            <tr><td>Seeded rows</td><td>82 post-deployment + 87 in views</td><td>169, harvested</td></tr>
+            <tr><td>UI framework</td><td>AdminLTE + jQuery + DataTables</td><td>MudBlazor 8</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Known divergences</h2>
+    <table>
+        <thead><tr><th>Divergence</th><th>Reason</th></tr></thead>
+        <tbody>
+            <tr><td>Sidebar lists published non-system views, derived from <code>DataView</code></td><td>Requested. The legacy&rsquo;s menu is the curated <code>Navigation</code> table only, so a new view was invisible until a menu entry was added by hand.</td></tr>
+            <tr><td>Auto-Initialize button removed</td><td>Requested. The generation itself remains available.</td></tr>
+            <tr><td>Text columns default to Text Area</td><td>SQLite reports <code>VARCHAR</code> and <code>TEXT</code> identically.</td></tr>
+            <tr><td>Clipboard, PDF and Print export unavailable</td><td>Client-side DataTables features; PDF needs a library. The menu says so rather than reporting a file that never arrives.</td></tr>
+            <tr><td>JavaScript actions not executed</td><td>Stored <code>javascript</code>-type actions operate on the DataTables API, which does not exist here.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Open items</h2>
+    <table>
+        <thead><tr><th>Item</th><th>Detail</th></tr></thead>
+        <tbody>
+            <tr><td>Authentication and authorization</td><td>Not present in the legacy and not invented here. <code>DataViewSecurityHelper</code> is the hook.</td></tr>
+            <tr><td>Field / column validation</td><td>A field naming a column that does not exist is accepted and fails on first insert. The table introspection needed to catch it at save time already exists.</td></tr>
+            <tr><td>Date field types</td><td>Types 7, 8 and 13 render as text inputs rather than pickers.</td></tr>
+            <tr><td>Charts</td><td><code>DataViewChart</code> and <code>DataViewChartTypes</code> are modelled and seeded; no chart rendering is implemented.</td></tr>
+            <tr><td>Action parameters</td><td><code>DataViewActionParameters</code> is modelled; procedure-backed actions with parameters are not wired.</td></tr>
+        </tbody>
+    </table>
+
+    <div class="note-box">
+        <p><strong>On reading this codebase.</strong> Almost every defect found during this port was of
+        one shape: two sides of a contract generated independently, each internally plausible, with
+        nothing checking that they agree. A dialog that collected values and a writer that never
+        existed; a page that discarded rows and an engine nothing called; a column name used where a
+        form-input name was meant. When something renders but shows nothing, the fault is rarely in the
+        thing you are looking at &mdash; it is in the join between it and the thing that feeds it.</p>
+    </div>
+</div>
+
+</body>
+</html>

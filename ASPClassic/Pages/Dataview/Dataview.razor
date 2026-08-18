@@ -1,0 +1,229 @@
+@page "/aspclassic-vbscript/dataview"
+
+@using ASPClassic.Application.DTOs.Data
+@using ASPClassic.Application.DTOs.Dataview
+@using MudBlazor
+
+<PageTitle>@_pageTitle</PageTitle>
+
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    <MudText Typo="Typo.body1" Class="pa-4">Loading DataView...</MudText>
+}
+else if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="ma-4">
+        <MudText Typo="Typo.h6">Critical Error!</MudText>
+        <MudText Typo="Typo.body1">@_errorMessage</MudText>
+    </MudAlert>
+}
+else if (_viewData is not null)
+{
+    @* DataView Description *@
+    @if (!string.IsNullOrEmpty(_viewData.ViewDescription))
+    {
+        <MudPaper Class="pa-3 mb-3" Elevation="0">
+            <MudText Typo="Typo.body1">@((MarkupString)_viewData.ViewDescription)</MudText>
+        </MudPaper>
+    }
+
+    @* Toolbar *@
+    <MudToolBar Dense="true" Class="mb-2">
+        @if (_allowInsert)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="OnAddClick" Size="Size.Small">Add</MudButton>
+        }
+        <MudButton Variant="Variant.Outlined" Color="Color.Default" StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="OnRefreshClick" Size="Size.Small">Refresh</MudButton>
+
+        @if (_allowRowSelection)
+        {
+            <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.SelectAll"
+                       OnClick="OnSelectAllClick" Size="Size.Small">Select All</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Default" StartIcon="@Icons.Material.Filled.Deselect"
+                       OnClick="OnDeselectAllClick" Size="Size.Small">Deselect All</MudButton>
+
+            @if (_allowDelete)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteSweep"
+                           OnClick="OnDeleteSelectedClick" Size="Size.Small"
+                           Disabled="@(_selectedItems.Count == 0)">Delete Selected</MudButton>
+            }
+        }
+
+        @if (_allowColumnsToggle)
+        {
+            <MudMenu Label="Columns" StartIcon="@Icons.Material.Filled.ViewColumn" Size="Size.Small"
+                     Variant="Variant.Outlined">
+                @foreach (var field in _visibleFields)
+                {
+                    var fId = field.FieldID;
+                    <MudMenuItem OnClick="@(() => ToggleColumnVisibility(fId))">
+                        <MudCheckBox Value="@IsColumnVisible(fId)"
+                                     T="bool" ReadOnly="true">@field.FieldLabel</MudCheckBox>
+                    </MudMenuItem>
+                }
+            </MudMenu>
+        }
+
+        @if (_allowExport)
+        {
+            <MudMenu Label="Export" StartIcon="@Icons.Material.Filled.FileDownload" Size="Size.Small"
+                     Variant="Variant.Outlined">
+                @if (_exportClipboard)
+                {
+                    <MudMenuItem OnClick="@(() => OnExportClick("clipboard"))">Copy to Clipboard</MudMenuItem>
+                }
+                @if (_exportExcel)
+                {
+                    <MudMenuItem OnClick="@(() => OnExportClick("excel"))">Excel</MudMenuItem>
+                }
+                @if (_exportCsv)
+                {
+                    <MudMenuItem OnClick="@(() => OnExportClick("csv"))">CSV</MudMenuItem>
+                }
+                @if (_exportPdf)
+                {
+                    <MudMenuItem OnClick="@(() => OnExportClick("pdf"))">PDF</MudMenuItem>
+                }
+                @if (_exportPrint)
+                {
+                    <MudMenuItem OnClick="@(() => OnExportClick("print"))">Print</MudMenuItem>
+                }
+            </MudMenu>
+        }
+
+        @* Custom toolbar action buttons *@
+        @if (_showCustomActions)
+        {
+            foreach (var action in _toolbarActions)
+            {
+                var capturedAction = action;
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small"
+                           StartIcon="@GetMudIcon(capturedAction.GlyphIcon)"
+                           Title="@(capturedAction.ActionTooltip ?? string.Empty)"
+                           OnClick="@(() => OnToolbarActionClick(capturedAction))">
+                    @capturedAction.ActionLabel
+                </MudButton>
+            }
+        }
+
+        <MudSpacer />
+
+        @if (_dtQuickSearch)
+        {
+            <MudTextField T="string" @bind-Value="_searchText" Placeholder="Search..."
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                          Immediate="true" DebounceInterval="400"
+                          @bind-Value:after="OnSearchChanged"
+                          Style="max-width:300px;" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        }
+    </MudToolBar>
+
+    @* Grid — columns: RowReorder | RowActions | VisibleFields *@
+    @* Columns: @_hasRowReorder reorder col, @(_showRowActions ? "Actions" : ""), then each visible field *@
+    <MudDataGrid T="Dictionary<string, object?>" Items="@_gridData" Dense="true" Hover="true" Striped="true"
+                 Bordered="true" FixedHeader="@_fixedHeaders" Height="@(_dtPagination ? null : "500px")"
+                 MultiSelection="@_allowRowSelection" SelectedItems="@_selectedItems"
+                 SelectedItemsChanged="OnSelectedItemsChanged"
+                 SortMode="@(_dtSort ? SortMode.Single : SortMode.None)"
+                 Filterable="@_allowSearch"
+                 RowsPerPage="@(_viewData.DataTableDefaultPageSize > 0 ? _viewData.DataTableDefaultPageSize : 25)">
+        <Columns>
+            @if (_hasRowReorder)
+            {
+                <PropertyColumn T="Dictionary<string, object?>" TProperty="string"
+                                Property="@(x => x.ContainsKey(_rowReorderColMasked) && x[_rowReorderColMasked] != null ? x[_rowReorderColMasked].ToString() : "")"
+                                Title="" Sortable="false" Filterable="false" />
+            }
+
+            @if (_showRowActions)
+            {
+                <TemplateColumn T="Dictionary<string, object?>" Title="" Sortable="false" Filterable="false">
+                    <CellTemplate>
+                        <MudStack Row="true" Spacing="0">
+                            @if (_allowRowDetails)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Info" Size="Size.Small"
+                                               Title="Details" OnClick="@(() => OnRowDetailsClick(context.Item))" />
+                            }
+                            @if (_allowClone)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small"
+                                               Title="Clone" OnClick="@(() => OnCloneClick(context.Item))" />
+                            }
+                            @if (_allowUpdate)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                                               Title="Edit" OnClick="@(() => OnEditClick(context.Item))" />
+                            }
+                            @if (_allowDelete)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small"
+                                               Color="Color.Error" Title="Delete"
+                                               OnClick="@(() => OnDeleteClick(context.Item))" />
+                            }
+                            @if (_showCustomActions)
+                            {
+                                foreach (var inlineAct in _inlineActions)
+                                {
+                                    var capturedInline = inlineAct;
+                                    <MudIconButton Icon="@GetMudIcon(capturedInline.GlyphIcon)" Size="Size.Small"
+                                                   Title="@(capturedInline.ActionTooltip ?? capturedInline.ActionLabel)"
+                                                   OnClick="@(() => OnInlineActionClick(capturedInline, context.Item))" />
+                                }
+                            }
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            }
+
+            @foreach (var field in _visibleFields)
+            {
+                if (IsColumnVisible(field.FieldID))
+                {
+                    var capturedField = field;
+                    <TemplateColumn T="Dictionary<string, object?>" Title="@capturedField.FieldLabel"
+                                    Sortable="@_dtSort" Filterable="@((capturedField.FieldFlags & 16) > 0)">
+                        <CellTemplate>
+                            @{
+                                @* FieldSource is the COLUMN; FieldIdentifier is the name of the
+                                   form input that edits it. A row is keyed by column, so reading it
+                                   by identifier misses every time and the grid renders blank cells
+                                   over rows that are actually there. The legacy keeps the two
+                                   strictly apart — Request(FieldIdentifier) posts, rs(FieldSource)
+                                   reads. Note also that ?? never falls through on a non-nullable
+                                   string, so the fallbacks below were unreachable. *@
+                                var cellKey = !string.IsNullOrWhiteSpace(capturedField.FieldSource)
+                                    ? capturedField.FieldSource
+                                    : capturedField.FieldLabel;
+                                var cellValue = context.Item.ContainsKey(cellKey) ? context.Item[cellKey]?.ToString() ?? "" : "";
+                            }
+                            @cellValue
+                        </CellTemplate>
+                    </TemplateColumn>
+                }
+            }
+        </Columns>
+
+        <PagerContent>
+            @if (_dtPagination)
+            {
+                <MudDataGridPager T="Dictionary<string, object?>" />
+            }
+        </PagerContent>
+
+        <NoRecordsContent>
+            <MudText Typo="Typo.body1">No records found.</MudText>
+        </NoRecordsContent>
+    </MudDataGrid>
+
+    @if (_dtInfo)
+    {
+        <MudText Typo="Typo.caption" Class="mt-1">
+            Showing @_gridData.Count record(s)
+        </MudText>
+    }
+}

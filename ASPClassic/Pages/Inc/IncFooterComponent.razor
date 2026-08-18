@@ -1,0 +1,77 @@
+@namespace ASPClassic.Pages.Inc
+
+@* Port of inc_footer.asp — shared footer component with admin sidebar. *@
+
+<!-- Main Footer -->
+<footer style="background-color: var(--mud-palette-surface); border-top: 1px solid var(--mud-palette-lines-default); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+    <div>
+        <strong>Copyright &copy; 2018 <MudLink Href="https://git.eitanblumin.com/CRUDE-ASP/" Target="_blank" Underline="Underline.Hover">Eitan Blumin</MudLink>.</strong>
+        All rights reserved.
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span><b>Version</b> 0.8-alpha</span>
+        <span>|</span>
+        <span><b>Powered by</b> <MudLink Href="https://adminlte.io/" Target="_blank" Underline="Underline.Hover">AdminLTE</MudLink></span>
+        @if (IsAdmin)
+        {
+            <span>|</span>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                           Size="Size.Small"
+                           OnClick="ToggleAdminDrawer"
+                           Title="Administration" />
+        }
+    </div>
+</footer>
+
+@* Control Sidebar — Admin Panel *@
+@if (IsAdmin && _adminDrawerOpen)
+{
+    <div style="position: fixed; top: 0; right: 0; width: 300px; height: 100vh; background-color: var(--mud-palette-dark); color: white; z-index: 1300; box-shadow: -2px 0 8px rgba(0,0,0,0.3); overflow-y: auto; padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <MudText Typo="Typo.h5" Style="color: white;">Administration</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           Size="Size.Small"
+                           OnClick="ToggleAdminDrawer"
+                           Style="color: white;" />
+        </div>
+
+        <MudDivider Style="border-color: rgba(255,255,255,0.2); margin-bottom: 8px;" />
+
+        <MudText Typo="Typo.h6" Style="color: white; margin-bottom: 4px;">Manage</MudText>
+        <MudNavMenu Dense="true" Style="color: white;">
+            <MudNavLink Href="/aspclassic-vbscript/dataview?ViewID=-1"
+                        Icon="@Icons.Material.Filled.Settings"
+                        Style="color: rgba(255,255,255,0.85);">
+                @GetWord("Manage Data Views")
+            </MudNavLink>
+            <MudNavLink Href="/aspclassic-vbscript/dataview?ViewID=-4"
+                        Icon="@Icons.Material.Filled.Link"
+                        Style="color: rgba(255,255,255,0.85);">
+                @GetWord("Manage Navigation")
+            </MudNavLink>
+        </MudNavMenu>
+
+        @if (IsOnDataviewPage && CurrentViewID.HasValue && CurrentViewID.Value > 0)
+        {
+            <MudDivider Style="border-color: rgba(255,255,255,0.2); margin-top: 8px; margin-bottom: 8px;" />
+            <MudText Typo="Typo.h6" Style="color: white; margin-bottom: 4px;">Manage This DataView</MudText>
+            <MudNavMenu Dense="true" Style="color: white;">
+                <MudNavLink Href="@($"/aspclassic-vbscript/dataview?ViewID=-1&mode=edit&DT_ItemId={CurrentViewID.Value}")"
+                            Icon="@Icons.Material.Filled.Edit"
+                            Style="color: rgba(255,255,255,0.85);">
+                    @GetWord("Edit DataView")
+                </MudNavLink>
+                <MudNavLink Href="@($"/aspclassic-vbscript/dataview?ViewID=-2&dataview[search]={CurrentViewID.Value}")"
+                            Icon="@Icons.Material.Filled.ViewList"
+                            Style="color: rgba(255,255,255,0.85);">
+                    @GetWord("Edit Fields")
+                </MudNavLink>
+                <MudNavLink Href="@($"/aspclassic-vbscript/dataview?ViewID=-3&dataview[search]={CurrentViewID.Value}")"
+                            Icon="@Icons.Material.Filled.FlashOn"
+                            Style="color: rgba(255,255,255,0.85);">
+                    @GetWord("Edit Actions")
+                </MudNavLink>
+            </MudNavMenu>
+        }
+    </div>
+}
